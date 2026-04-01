@@ -1,0 +1,62 @@
+seed: 42
+project:
+  name: autoresearch-by-harsh-vardhan
+  group: vR.1-smoke
+  tags:
+  - phase1
+  - scratch
+  - vR.1
+  - kaggle
+  - smoke
+  - sr3
+runtime:
+  version: vR.1
+  lineage: scratch
+  parent: null
+paths:
+  artifact_root: artifacts
+  report_root: reports
+  datasets:
+    kaggle_4x:
+      hr_dir: C:\Users\harsh\.cache\kagglehub\datasets\cristobaltudela\4x-satellite-image-super-resolution\versions\1\HR_0.5m\HR_0.5m
+      lr_dir: C:\Users\harsh\.cache\kagglehub\datasets\cristobaltudela\4x-satellite-image-super-resolution\versions\1\LR_2m\LR_2m
+dataset:
+  family: kaggle
+  name: kaggle_4x
+  pairing_mode: paired
+  scale_factor: 4
+data:
+  patch_size: 64
+  batch_size: 2
+  num_workers: 0
+  val_split: 0.1
+  fixed_scale: 4
+  train_limit: null
+  val_limit: 4
+tracking:
+  enabled: true
+  mode: online
+  project: autoresearch-by-harsh-vardhan
+  entity: null
+  notes: HNDSR scratch research lane
+model:
+  kind: sr3
+  model_channels: 32
+training:
+  epochs: 1
+  lr: 0.0001
+  weight_decay: 0.0001
+  grad_clip: 1.0
+  max_train_batches: 4
+  max_val_batches: 2
+  checkpoint_name: vR.1_smoke_best.pt
+diffusion:
+  num_timesteps: 1000
+  beta_start: 0.0001
+  beta_end: 0.02
+  inference_steps: 10
+evaluation:
+  sample_limit: 8
+  save_limit: 8
+  compute_lpips: true
+  grid_name: vR.1_smoke_grid.png

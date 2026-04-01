@@ -1,0 +1,37 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "autoresearch-by-harsh-vardhan"
+version = "0.1.0"
+description = "Standalone HNDSR research platform inspired by karpathy/autoresearch."
+readme = "README.md"
+requires-python = ">=3.10"
+dependencies = [
+  "pillow>=10.0.0",
+  "pyyaml>=6.0.0",
+  "scikit-image>=0.22.0",
+  "torch>=2.2.0",
+  "torchvision>=0.17.0",
+  "tqdm>=4.66.0",
+  "wandb>=0.17.0",
+]
+
+[project.optional-dependencies]
+dev = [
+  "pytest>=8.0.0",
+]
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+addopts = "-q -p no:cacheprovider"
+
+
+

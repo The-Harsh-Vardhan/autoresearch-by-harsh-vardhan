@@ -1,0 +1,32 @@
+{
+  "benchmark_delta": {
+    "psnr_delta": 0.5961,
+    "ssim_delta": 0.0435
+  },
+  "decision": "freeze and fork next version",
+  "eval_summary": {
+    "psnr_mean": 31.2,
+    "ssim_mean": 0.78
+  },
+  "findings": [
+    {
+      "message": "PSNR exceeds the bicubic control by 0.5961.",
+      "severity": "low"
+    },
+    {
+      "message": "SSIM exceeds the bicubic control by 0.0435.",
+      "severity": "low"
+    }
+  ],
+  "next_ablations": [
+    "vR.1.1: increase model_channels from 32 to 64 while keeping the dataset and evaluation contract fixed",
+    "vR.2: raise inference_steps from 10 to 20 without changing the training dataset or loss family"
+  ],
+  "roast": [
+    "The platform is not allowed to hide behind a pretty notebook if the pulled bundle is incomplete.",
+    "Any run without an online W&B URL is operationally unfinished, not almost done.",
+    "If bicubic still wins, architecture heroics are premature; the first fix is discipline, not bravado."
+  ],
+  "version": "vR.1",
+  "wandb_url": "https://wandb.example/run/vr1"
+}

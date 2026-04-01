@@ -1,0 +1,15 @@
+{
+  "code_file": "vR.1_HNDSR.ipynb",
+  "competition_sources": [],
+  "dataset_sources": [
+    "brsdincer/4x-satellite-image-super-resolution"
+  ],
+  "enable_gpu": true,
+  "enable_internet": true,
+  "id": "INSERT_KAGGLE_USERNAME/vr1-hndsr",
+  "is_private": true,
+  "kernel_sources": [],
+  "kernel_type": "notebook",
+  "language": "python",
+  "title": "vR.1 HNDSR Scratch Baseline"
+}

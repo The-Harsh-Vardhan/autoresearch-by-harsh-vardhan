@@ -1,0 +1,28 @@
+{
+  "lane": "HNDSR scratch",
+  "control_baselines": {
+    "kaggle_4x_bicubic_smoke": {
+      "dataset": "kaggle_4x",
+      "protocol": "paired 4x smoke pack",
+      "psnr_mean": 30.6039,
+      "ssim_mean": 0.7365,
+      "source": "Mini Project hndsr_rebuild bootstrap results"
+    },
+    "sr3_smoke_cpu": {
+      "dataset": "kaggle_4x",
+      "protocol": "paired 4x smoke pack",
+      "psnr_mean": 7.9618,
+      "ssim_mean": 0.0072,
+      "source": "Mini Project hndsr_rebuild bootstrap results"
+    }
+  },
+  "paper_targets": [
+    {
+      "name": "HNDSR target",
+      "psnr_mean": 29.4,
+      "ssim_mean": 0.87,
+      "lpips_mean": 0.16,
+      "comparable_only_if": "same dataset, same scale, and same evaluation protocol"
+    }
+  ]
+}
