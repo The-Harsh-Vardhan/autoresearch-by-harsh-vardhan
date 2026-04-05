@@ -1,0 +1,54 @@
+seed: 42
+
+project:
+  name: autoresearch-by-harsh-vardhan
+  group: nlp-lm
+  tags: [phase1, nlp]
+
+runtime:
+  version: v1.0
+  lineage: scratch
+  parent: null
+
+paths:
+  artifact_root: artifacts
+  report_root: reports
+  datasets:
+    tiny_shakespeare:
+      text_file: data/tiny_shakespeare.txt
+
+dataset:
+  name: tiny_shakespeare
+
+data:
+  seq_len: 128
+  batch_size: 32
+  val_split: 0.1
+  train_limit: null
+  val_limit: null
+
+tracking:
+  enabled: true
+  mode: online
+  project: autoresearch-by-harsh-vardhan
+  entity: null
+  notes: NLP LM research lane
+
+model:
+  kind: gpt_nano
+  n_embd: 64
+  n_head: 4
+  n_layer: 4
+  dropout: 0.1
+
+training:
+  epochs: 5
+  lr: 0.0003
+  weight_decay: 0.01
+  grad_clip: 1.0
+  max_train_batches: null
+  max_val_batches: null
+  checkpoint_name: v1.0_train_best.pt
+
+evaluation:
+  sample_limit: 50

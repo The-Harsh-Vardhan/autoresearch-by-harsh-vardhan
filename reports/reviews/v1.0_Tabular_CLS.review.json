@@ -1,0 +1,26 @@
+{
+  "benchmark_delta": {
+    "accuracy_delta": 0.0,
+    "f1_delta": 0.0
+  },
+  "decision": "patch in place",
+  "domain": "tabular_cls",
+  "eval_summary": null,
+  "findings": [
+    {
+      "message": "No evaluation summary found.",
+      "severity": "critical"
+    }
+  ],
+  "next_ablations": [
+    "v1.0.1: fix evaluation pipeline",
+    "v2.0: try a different dataset"
+  ],
+  "roast": [
+    "A logistic regression beats your MLP? That's not a model, that's a participation trophy.",
+    "If your tabular model can't beat sklearn, rethink the architecture before adding layers.",
+    "Iris has 150 samples. If you need 30 epochs, your learning rate is begging for help."
+  ],
+  "version": "v1.0",
+  "wandb_url": null
+}

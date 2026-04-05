@@ -1,0 +1,43 @@
+# Python
+.pytest_cache/
+.ruff_cache/
+.venv/
+__pycache__/
+*.py[cod]
+*.egg-info/
+dist/
+build/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Tools
+.gemini/
+wandb/
+pytest-cache-files-*
+
+# Credentials and local overrides
+.env
+configs/*/local.yaml
+
+# Artifacts (tracked structure, not contents)
+artifacts/*
+!artifacts/.gitkeep
+!artifacts/runs/
+artifacts/runs/*
+!artifacts/runs/.gitkeep
+artifacts/.tmp/
+
+# Generated reports (review docs are tracked, generated outputs are not)
+reports/generated/*
+!reports/generated/.gitkeep
+
+# Binary outputs
+*.pt
+*.png
+*.jsonl
+
+# Jupyter
+notebooks/versions/.ipynb_checkpoints/
+.ipynb_checkpoints/

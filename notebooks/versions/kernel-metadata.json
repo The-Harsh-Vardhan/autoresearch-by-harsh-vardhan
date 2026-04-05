@@ -1,0 +1,10 @@
+{
+  "code_file": "v1.0_Tabular_CLS.ipynb",
+  "enable_gpu": false,
+  "enable_internet": true,
+  "id": "INSERT_KAGGLE_USERNAME/tabular-cls-v1",
+  "is_private": true,
+  "kernel_type": "notebook",
+  "language": "python",
+  "title": "Tabular Classification v1.0"
+}

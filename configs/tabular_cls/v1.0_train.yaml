@@ -1,0 +1,42 @@
+seed: 42
+project:
+  name: autoresearch-by-harsh-vardhan
+  group: v1.0-train
+  tags:
+  - tabular
+  - classification
+  - v1.0
+  - scratch
+  - train
+  - mlp
+runtime:
+  version: v1.0
+  lineage: scratch
+  parent: null
+paths:
+  artifact_root: artifacts
+  report_root: reports
+data:
+  dataset: iris
+  val_split: 0.2
+  batch_size: 32
+tracking:
+  enabled: true
+  mode: online
+  project: autoresearch-by-harsh-vardhan
+  entity: null
+  notes: Tabular classification research lane
+model:
+  kind: mlp
+  hidden_dim: 64
+  dropout: 0.2
+training:
+  epochs: 30
+  lr: 0.001
+  weight_decay: 0.0001
+  max_train_batches: null
+  max_val_batches: null
+  checkpoint_name: v1.0_train_best.pt
+evaluation:
+  sample_limit: 100
+  save_limit: 8
