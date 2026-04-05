@@ -16,7 +16,7 @@ Improve the `vR.x` HNDSR scratch lane through bounded, reviewable experiments th
 ## Allowed Mutation Surface
 
 - New version scaffolds under `notebooks/versions/`, `docs/notebooks/`, `reports/reviews/`, and `configs/hndsr_vr/`
-- HNDSR runtime modules under `src/autoresearch_hv/hndsr_vr/`
+- HNDSR runtime modules under `src/chakra/hndsr_vr/`
 - Benchmark registry and review heuristics
 
 ## Disallowed Mutation Surface

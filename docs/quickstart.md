@@ -35,7 +35,7 @@ pip install -e ".[dev]"
 ### Verify installation
 
 ```bash
-python -m autoresearch_hv list-domains
+python -m chakra list-domains
 ```
 
 You should see three domains: `hndsr_vr`, `nlp_lm`, `tabular_cls`.
@@ -61,7 +61,7 @@ The fastest way to see the full lifecycle is with the tabular classification dom
 ### 3a. Scaffold the version
 
 ```bash
-python -m autoresearch_hv --domain tabular_cls scaffold-version --version v1.0 --force
+python -m chakra --domain tabular_cls scaffold-version --version v1.0 --force
 ```
 
 This creates:
@@ -72,7 +72,7 @@ This creates:
 ### 3b. Run the control baseline
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v1.0_control.yaml \
   --run-name v1.0-control --device cpu
 ```
@@ -84,7 +84,7 @@ This trains a logistic regression for 1 epoch with 0 train batches — it measur
 ### 3c. Train the MLP
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v1.0_train.yaml \
   --run-name v1.0-train --device cpu
 ```
@@ -94,7 +94,7 @@ python -m autoresearch_hv.domains.tabular_cls.train_runner \
 ### 3d. Evaluate
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
+python -m chakra.domains.tabular_cls.evaluate_runner \
   --config configs/tabular_cls/v1.0_train.yaml \
   --run-name v1.0-eval \
   --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt \
@@ -107,14 +107,14 @@ python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
 
 ```bash
 # Index results into a run manifest
-python -m autoresearch_hv --domain tabular_cls sync-run \
+python -m chakra --domain tabular_cls sync-run \
   --version v1.0 --source-dir artifacts/v1.0-train
 
 # Generate an automated review and roast
-python -m autoresearch_hv --domain tabular_cls review-run --version v1.0
+python -m chakra --domain tabular_cls review-run --version v1.0
 
 # Validate the version contract (all files exist)
-python -m autoresearch_hv --domain tabular_cls validate-version --version v1.0
+python -m chakra --domain tabular_cls validate-version --version v1.0
 ```
 
 **Expected output:** `v1.0 contract passed for domain 'tabular_cls'.`
@@ -129,12 +129,12 @@ The same domain supports multiple datasets. Run the Titanic survival prediction:
 
 ```bash
 # Train
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v2.0_train.yaml \
   --run-name v2.0-train --device cpu
 
 # Evaluate
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
+python -m chakra.domains.tabular_cls.evaluate_runner \
   --config configs/tabular_cls/v2.0_train.yaml \
   --run-name v2.0-eval \
   --checkpoint artifacts/v2.0-train/checkpoints/v2.0_train_best.pt \
@@ -149,18 +149,18 @@ python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
 
 ```bash
 # Scaffold
-python -m autoresearch_hv --domain nlp_lm scaffold-version --version v1.0 --force
+python -m chakra --domain nlp_lm scaffold-version --version v1.0 --force
 
 # Control baseline (bigram model)
-python -m autoresearch_hv.domains.nlp_lm.train_runner \
+python -m chakra.domains.nlp_lm.train_runner \
   --config configs/nlp_lm/v1.0_control.yaml --run-name v1.0-control --device cpu
 
 # Full training (GPT-nano, 5 epochs)
-python -m autoresearch_hv.domains.nlp_lm.train_runner \
+python -m chakra.domains.nlp_lm.train_runner \
   --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-train --device cpu
 
 # Evaluate
-python -m autoresearch_hv.domains.nlp_lm.evaluate_runner \
+python -m chakra.domains.nlp_lm.evaluate_runner \
   --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-eval \
   --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
 ```

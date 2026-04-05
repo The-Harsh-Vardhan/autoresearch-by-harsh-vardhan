@@ -1,6 +1,6 @@
 seed: 42
 project:
-  name: autoresearch-by-harsh-vardhan
+  name: chakra
   group: vR.1-train
   tags:
   - phase1
@@ -36,7 +36,7 @@ data:
 tracking:
   enabled: true
   mode: online
-  project: autoresearch-by-harsh-vardhan
+  project: chakra
   entity: null
   notes: HNDSR scratch research lane
 model:

@@ -3,9 +3,9 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "autoresearch-by-harsh-vardhan"
-version = "0.2.0"
-description = "General-purpose autonomous research platform for any model-training domain."
+name = "chakra-research"
+version = "0.3.0"
+description = "Chakra — Autonomous Research System. A cyclic, domain-agnostic ML research engine."
 readme = "README.md"
 license = {text = "MIT"}
 requires-python = ">=3.10"
@@ -40,7 +40,8 @@ dev = [
 ]
 
 [project.scripts]
-autoresearch = "autoresearch_hv.cli:main"
+autoresearch = "chakra.cli:main"
+chakra = "chakra.chakra_cli:main"
 
 [tool.setuptools]
 package-dir = {"" = "src"}
@@ -49,9 +50,9 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
-"autoresearch_hv.domains.hndsr_vr" = ["domain.yaml"]
-"autoresearch_hv.domains.nlp_lm" = ["domain.yaml"]
-"autoresearch_hv.domains.tabular_cls" = ["domain.yaml"]
+"chakra.domains.hndsr_vr" = ["domain.yaml"]
+"chakra.domains.nlp_lm" = ["domain.yaml"]
+"chakra.domains.tabular_cls" = ["domain.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

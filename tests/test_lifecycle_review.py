@@ -23,14 +23,14 @@ def _fresh_dir(name: str) -> Path:
 
 
 def test_sync_review_and_mirror_pipeline(monkeypatch):
-    import autoresearch_hv.hndsr_vr.lifecycle as lifecycle
-    import autoresearch_hv.hndsr_vr.utils as utils
-    from autoresearch_hv.hndsr_vr.lifecycle import mirror_obsidian, next_ablation, review_run, sync_run
+    import chakra.hndsr_vr.lifecycle as lifecycle
+    import chakra.hndsr_vr.utils as utils
+    from chakra.hndsr_vr.lifecycle import mirror_obsidian, next_ablation, review_run, sync_run
 
     # The shim lifecycle wraps core lifecycle with partial(domain='hndsr_vr')
     # For this test we need to monkeypatch the REPO_ROOT in core modules
-    from autoresearch_hv.core import utils as core_utils
-    from autoresearch_hv.core import lifecycle as core_lifecycle
+    from chakra.core import utils as core_utils
+    from chakra.core import lifecycle as core_lifecycle
 
     version = "vR.9"
     temp_root = _fresh_dir("lifecycle-root").resolve()
@@ -38,7 +38,7 @@ def test_sync_review_and_mirror_pipeline(monkeypatch):
     monkeypatch.setattr(core_lifecycle, "REPO_ROOT", temp_root)
 
     # The domain module imports REPO_ROOT at import time, so we must patch it there too
-    from autoresearch_hv.domains.hndsr_vr import lifecycle as domain_lifecycle
+    from chakra.domains.hndsr_vr import lifecycle as domain_lifecycle
     monkeypatch.setattr(domain_lifecycle, "REPO_ROOT", temp_root)
 
     benchmark_dir = temp_root / "benchmarks"

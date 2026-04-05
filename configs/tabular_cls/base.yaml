@@ -1,7 +1,7 @@
 seed: 42
 
 project:
-  name: autoresearch-by-harsh-vardhan
+  name: chakra
   group: tabular-v1
   tags: [tabular, classification, iris]
 
@@ -22,7 +22,7 @@ data:
 tracking:
   enabled: true
   mode: online
-  project: autoresearch-by-harsh-vardhan
+  project: chakra
   entity: null
   notes: Tabular classification — Iris baseline
 

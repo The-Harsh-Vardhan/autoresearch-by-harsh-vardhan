@@ -1,0 +1,15 @@
+name: tabular_cls
+display_name: Tabular Classification
+version_pattern: "^v\\d+\\.\\d+(?:\\.\\d+)?$"
+model_kinds:
+  - logistic
+  - mlp
+primary_metric: accuracy
+metric_direction: higher_is_better
+benchmark_registry: benchmarks/tabular_cls_registry.json
+config_dir: configs/tabular_cls
+programs_doc: programs/tabular_cls.md
+entrypoints:
+  lifecycle: chakra.domains.tabular_cls.lifecycle
+  train_runner: chakra.domains.tabular_cls.train_runner
+  evaluate_runner: chakra.domains.tabular_cls.evaluate_runner

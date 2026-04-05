@@ -5,7 +5,7 @@ import os
 from pathlib import Path
 from uuid import uuid4
 
-from autoresearch_hv.core.utils import (
+from chakra.core.utils import (
     _parse_simple_yaml,
     _yaml_scalar,
     flatten_config,
@@ -13,7 +13,7 @@ from autoresearch_hv.core.utils import (
     load_yaml_text,
     set_seed,
 )
-from autoresearch_hv.core.tracker import NullTracker
+from chakra.core.tracker import NullTracker
 
 
 # ---------------------------------------------------------------------------
@@ -173,7 +173,7 @@ def test_null_tracker_logs_artifacts():
 
 
 def test_next_version_labels():
-    from autoresearch_hv.core.lifecycle import _next_version_labels
+    from chakra.core.lifecycle import _next_version_labels
 
     # HNDSR-style: vR.1 → vR.2, vR.1.1
     major, minor = _next_version_labels("vR.1")

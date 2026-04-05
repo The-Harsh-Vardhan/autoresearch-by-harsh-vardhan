@@ -7,7 +7,7 @@ import pytest
 
 def test_tabular_cls_discovered():
     """The tabular_cls domain is auto-discovered by the registry."""
-    from autoresearch_hv.core.domain_registry import discover_domains
+    from chakra.core.domain_registry import discover_domains
     domains = discover_domains()
     assert "tabular_cls" in domains
     manifest = domains["tabular_cls"]
@@ -20,22 +20,22 @@ def test_tabular_cls_discovered():
 
 def test_tabular_cls_lifecycle_hooks_protocol():
     """LifecycleHooks satisfies the DomainLifecycleHooks protocol."""
-    from autoresearch_hv.core.interfaces import DomainLifecycleHooks
-    from autoresearch_hv.domains.tabular_cls.lifecycle import LifecycleHooks
+    from chakra.core.interfaces import DomainLifecycleHooks
+    from chakra.domains.tabular_cls.lifecycle import LifecycleHooks
     hooks = LifecycleHooks()
     assert isinstance(hooks, DomainLifecycleHooks)
 
 
 def test_tabular_version_naming():
     """version_stem and version_slug produce expected outputs."""
-    from autoresearch_hv.domains.tabular_cls.utils import version_slug, version_stem
+    from chakra.domains.tabular_cls.utils import version_slug, version_stem
     assert version_stem("v1.0") == "v1.0_Tabular_CLS"
     assert version_slug("v1.0") == "v1-0-tabular-cls"
 
 
 def test_tabular_resolve_paths():
     """resolve_version_paths returns a VersionPaths with correct structure."""
-    from autoresearch_hv.domains.tabular_cls.lifecycle import LifecycleHooks
+    from chakra.domains.tabular_cls.lifecycle import LifecycleHooks
     hooks = LifecycleHooks()
     paths = hooks.resolve_version_paths("v1.0")
     assert paths.version == "v1.0"
@@ -47,7 +47,7 @@ def test_tabular_resolve_paths():
 
 def test_tabular_build_configs():
     """build_version_configs generates control/smoke/train variants."""
-    from autoresearch_hv.domains.tabular_cls.lifecycle import LifecycleHooks
+    from chakra.domains.tabular_cls.lifecycle import LifecycleHooks
     hooks = LifecycleHooks()
     configs = hooks.build_version_configs("v1.0", parent=None, lineage="scratch")
     assert set(configs.keys()) == {"control", "smoke", "train"}
@@ -61,7 +61,7 @@ def test_tabular_build_configs():
 
 def test_tabular_iris_dataset():
     """Iris dataset loads correctly with expected shape."""
-    from autoresearch_hv.domains.tabular_cls.dataset import build_loaders
+    from chakra.domains.tabular_cls.dataset import build_loaders
     config = {
         "data": {"dataset": "iris", "val_split": 0.2, "batch_size": 32},
     }
@@ -75,7 +75,7 @@ def test_tabular_iris_dataset():
 def test_tabular_models_forward():
     """Both models produce correct output shapes."""
     import torch
-    from autoresearch_hv.domains.tabular_cls.models import LogisticBaseline, SmallMLP
+    from chakra.domains.tabular_cls.models import LogisticBaseline, SmallMLP
 
     x = torch.randn(8, 4)
     logistic = LogisticBaseline(num_features=4, num_classes=3)
@@ -90,7 +90,7 @@ def test_tabular_models_forward():
 def test_tabular_metrics():
     """Metric functions return sensible values."""
     import torch
-    from autoresearch_hv.domains.tabular_cls.metrics import calculate_accuracy, calculate_cross_entropy, calculate_f1
+    from chakra.domains.tabular_cls.metrics import calculate_accuracy, calculate_cross_entropy, calculate_f1
 
     logits = torch.tensor([[2.0, 0.1, 0.1], [0.1, 2.0, 0.1], [0.1, 0.1, 2.0]])
     targets = torch.tensor([0, 1, 2])
@@ -101,7 +101,7 @@ def test_tabular_metrics():
 
 def test_tabular_roast_lines():
     """roast_lines returns non-empty list."""
-    from autoresearch_hv.domains.tabular_cls.lifecycle import LifecycleHooks
+    from chakra.domains.tabular_cls.lifecycle import LifecycleHooks
     hooks = LifecycleHooks()
     lines = hooks.roast_lines()
     assert len(lines) >= 1

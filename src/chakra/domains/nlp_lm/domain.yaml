@@ -1,0 +1,15 @@
+name: nlp_lm
+display_name: NLP Language Modelling
+version_pattern: "^v\\d+\\.\\d+(?:\\.\\d+)?$"
+model_kinds:
+  - gpt_nano
+  - bigram
+primary_metric: val_bpb
+metric_direction: lower_is_better
+benchmark_registry: benchmarks/nlp_lm_registry.json
+config_dir: configs/nlp_lm
+programs_doc: programs/nlp_lm.md
+entrypoints:
+  lifecycle: chakra.domains.nlp_lm.lifecycle
+  train_runner: chakra.domains.nlp_lm.train_runner
+  evaluate_runner: chakra.domains.nlp_lm.evaluate_runner

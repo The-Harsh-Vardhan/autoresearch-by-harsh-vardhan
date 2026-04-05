@@ -8,7 +8,7 @@ import sys
 def _run_cli(*args: str) -> subprocess.CompletedProcess:
     env = {**os.environ, "PYTHONPATH": "src"}
     return subprocess.run(
-        [sys.executable, "-m", "autoresearch_hv", *args],
+        [sys.executable, "-m", "chakra", *args],
         capture_output=True,
         text=True,
         cwd=os.getcwd(),

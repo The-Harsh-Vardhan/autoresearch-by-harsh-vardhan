@@ -12,7 +12,7 @@ pytestmark = pytest.mark.skipif(not HAS_TORCH, reason="torch not installed")
 
 
 def test_vr1_notebook_contract_passes():
-    from autoresearch_hv.hndsr_vr.notebook_contract import validate_versioned_notebook
+    from chakra.hndsr_vr.notebook_contract import validate_versioned_notebook
     failures = validate_versioned_notebook(
         notebook_path="notebooks/versions/vR.1_HNDSR.ipynb",
         doc_path="docs/notebooks/vR.1_HNDSR.md",

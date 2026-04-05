@@ -1,9 +1,0 @@
-"""Backwards-compatible re-exports. Prefer autoresearch_hv.domains.hndsr_vr.models."""
-
-from autoresearch_hv.domains.hndsr_vr.models import (  # noqa: F401
-    SinusoidalPositionEmbeddings,
-    ResidualTimeBlock,
-    ConditionalUNet,
-    DDPMScheduler,
-    SR3Baseline,
-)

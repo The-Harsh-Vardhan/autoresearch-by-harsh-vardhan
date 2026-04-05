@@ -1,45 +1,68 @@
-<p align="center">
-  <h1 align="center">🔬 AutoResearch by Harsh Vardhan</h1>
-  <p align="center">
-    <em>A domain-agnostic, pluggable framework for autonomous ML research — from scaffold to review.</em>
-  </p>
-  <p align="center">
-    <a href="LICENSE"><img src="https://img.shields.io/badge/License-MIT-blue.svg" alt="License: MIT"></a>
-    <a href="https://www.python.org/downloads/"><img src="https://img.shields.io/badge/python-3.10+-blue.svg" alt="Python 3.10+"></a>
-    <a href="https://pytorch.org/"><img src="https://img.shields.io/badge/PyTorch-2.2+-ee4c2c.svg" alt="PyTorch"></a>
-    <a href="https://wandb.ai/"><img src="https://img.shields.io/badge/W%26B-Tracking-yellow.svg" alt="W&B"></a>
-    <img src="https://img.shields.io/badge/tests-47%20passed-brightgreen.svg" alt="Tests: 47 passed">
-    <img src="https://img.shields.io/badge/domains-3%20shipped-blueviolet.svg" alt="Domains: 3 shipped">
-  </p>
-</p>
+# Chakra — Autonomous Research System
+
+[![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+[![Python 3.10+](https://img.shields.io/badge/Python-3.10+-green.svg)](https://python.org)
+[![PyTorch 2.2+](https://img.shields.io/badge/PyTorch-2.2+-ee4c2c.svg)](https://pytorch.org)
+[![W&B Tracking](https://img.shields.io/badge/W%26B-Tracked-orange.svg)](https://wandb.ai)
+[![47 Tests Passed](https://img.shields.io/badge/Tests-47%20Passed-brightgreen.svg)](#testing)
+[![3 Domains](https://img.shields.io/badge/Domains-3%20Shipped-purple.svg)](#shipped-domains)
+
+**A cyclic, autonomous research engine that plans, trains, guards, reviews, and improves ML experiments — then repeats.**
+
+Chakra eliminates manual experiment management. You define a research domain once. Chakra handles the rest: scaffolding configs, running baselines, training models, evaluating checkpoints, validating contracts, generating reviews, and proposing the next iteration. One command runs the entire loop.
+
+```bash
+chakra aavart --domain tabular_cls --version v1.0 --device cpu --force
+```
+
+This single command executes the full research cycle — from creating the experiment plan to proposing improvements for v1.1.
 
 ---
 
-## What is AutoResearch?
+## The Cycle
 
-AutoResearch is a **closed-loop autonomous ML research framework** inspired by [Karpathy's autoresearch](https://github.com/karpathy/autoresearch) and the [AR by HV pipeline design](docs/Autonomous%20ML%20Project%20Pipeline%20Design.md). It provides a structured, reproducible lifecycle for ML experiments:
+Every experiment in Chakra follows a five-stage loop:
 
 ```
-Scaffold → Configure → Train → Evaluate → Sync → Review → Promote
+    ┌──────────────────────────────────────────┐
+    │                                          │
+    ▼                                          │
+  Plan ──→ Execute ──→ Guard ──→ Review ──→ Improve
+    │                                          │
+    └──────────────────────────────────────────┘
 ```
 
-Unlike monolithic experiment scripts, AutoResearch separates **what** you research (domains) from **how** you manage it (lifecycle), making it trivial to add new research lanes without touching the core engine.
+| # | Stage | What Happens |
+|---|-------|-------------|
+| 1 | **Plan** | Scaffold version assets. Freeze configs. Define the hypothesis. |
+| 2 | **Execute** | Train control baseline → smoke test → full training → evaluate. |
+| 3 | **Guard** | Validate that all required files and contracts are satisfied. |
+| 4 | **Review** | Sync results. Generate metric deltas. Produce a structured roast. |
+| 5 | **Improve** | Analyze findings. Propose bounded ablation suggestions for next version. |
 
-### Key Features
+When the cycle completes, the system either **freezes** the version (if results are good) or **forks** a new version with proposed improvements. Then the cycle repeats.
 
-- 🔌 **Pluggable Domains** — Add a new ML domain with zero modifications to the core. Each domain is auto-discovered via `domain.yaml` manifests.
-- 📊 **W&B Experiment Tracking** — Built-in Weights & Biases integration with graceful fallback to a local null tracker when offline.
-- 🔁 **Full Lifecycle Management** — Scaffold, version, train, evaluate, sync, review, and promote experiments through a single CLI.
-- 🎯 **Frozen Ablation Plans** — Configs are immutable per version, preventing goal-drift during autonomous runs.
-- 📝 **Automated Review & Roast** — Every version gets a structured audit, metric delta analysis, and ablation suggestions.
-- 🧪 **47 Tests, Zero Failures** — Comprehensive test suite covering all three domains.
+### Chakra Identity
+
+Each stage has a Sanskrit name that reflects its purpose:
+
+| Chakra Term | Meaning | Stage |
+|-------------|---------|-------|
+| **Sutra** (सूत्र) | Thread / Formula | Plan |
+| **Yantra** (यन्त्र) | Instrument / Machine | Execute |
+| **Rakshak** (रक्षक) | Guardian | Guard |
+| **Vimarsh** (विमर्श) | Reflection / Analysis | Review |
+| **Manthan** (मन्थन) | Churning (of the ocean) | Improve |
+| **Aavart** (आवर्त) | Cycle / Revolution | Full Loop |
+
+> *Chakra* (चक्र) means *wheel* — the cycle that never stops turning.
 
 ---
 
 ## Shipped Domains & Real Results
 
-| Domain | Description | Primary Metric | Control Baseline | Trained Model | Improvement |
-|--------|-------------|---------------|-----------------|--------------|-------------|
+| Domain | Task | Metric | Control Baseline | Trained Model | Δ |
+|--------|------|--------|-----------------|--------------|---|
 | **`hndsr_vr`** | Satellite super-resolution | PSNR ↑ | Bicubic baseline | SR3 diffusion | — |
 | **`nlp_lm`** | Character-level language model | BPB ↓ | Bigram: **6.38** | GPT-nano: **3.59** | **44% ↓** |
 | **`tabular_cls`** (Iris) | Flower classification | Accuracy ↑ | Logistic: **16.7%** | MLP: **93.3%** | **+76.7pp** |
@@ -51,104 +74,73 @@ Unlike monolithic experiment scripts, AutoResearch separates **what** you resear
 
 ## Quick Start
 
-> 📖 **For the full guide** see [How to Use AutoResearch](docs/how_to_use.md) — covers every command, config option, W&B setup, troubleshooting, and how to add your own domain. For a 5-minute walkthrough, see the [Quickstart](docs/quickstart.md).
+> 📖 **For the full guide** see [How to Use Chakra](docs/how_to_use.md) — covers every command, config option, W&B setup, troubleshooting, and how to add your own domain. For a 5-minute walkthrough, see the [Quickstart](docs/quickstart.md).
 
-### 1. Clone & Install
+### 1. Install
 
 ```bash
 git clone https://github.com/The-Harsh-Vardhan/autoresearch-by-harsh-vardhan.git
 cd autoresearch-by-harsh-vardhan
-
-# Create virtual environment
-python -m venv .venv
-
-# Activate (Linux/Mac)
-source .venv/bin/activate
-# Activate (Windows PowerShell)
-.venv\Scripts\activate
-
-# Install with dev dependencies
+python -m venv .venv && .venv/Scripts/activate   # Windows
 pip install -e ".[dev]"
 ```
 
-### 2. (Optional) Set Up W&B Tracking
-
-Create a `.env` file in the repo root:
+### 2. Run the Full Cycle (One Command)
 
 ```bash
-WANDB_API_KEY=your_wandb_api_key_here
+chakra aavart --domain tabular_cls --version v1.0 --device cpu --force
 ```
 
-> If no API key is set, runs will automatically use the local null tracker — no errors, no data loss. You can sync to W&B later.
+This runs the complete Aavart (Full Cycle):
 
-### 3. Discover Domains
+```
+🔁 [Chakra] Starting Aavart (Full Cycle) — tabular_cls v1.0
+  📜 Sutra (Plan): Scaffolding version assets...
+  📜 Sutra (Plan): ✓ Configs frozen
+  ⚙️ Yantra (Execute): Running control baseline...
+  ⚙️ Yantra (Execute): ✓ Control baseline complete
+  ⚙️ Yantra (Execute): Running smoke test...
+  ⚙️ Yantra (Execute): ✓ Smoke test complete
+  ⚙️ Yantra (Execute): Running full training...
+  ⚙️ Yantra (Execute): ✓ Training complete
+  ⚙️ Yantra (Execute): Evaluating best checkpoint...
+  ⚙️ Yantra (Execute): ✓ Evaluation complete
+  🔍 Vimarsh (Review): Syncing results...
+  🔍 Vimarsh (Review): ✓ Review written
+  🛡️ Rakshak (Guard): Validating version contract...
+  🛡️ Rakshak (Guard): ✓ Contract passed
+  🔄 Manthan (Improve): Generating ablation suggestions...
+  🔄 Manthan (Improve): ✓ Ablations proposed
+✅ [Chakra] Aavart complete — tabular_cls v1.0. Decision: freeze and fork next version.
+```
+
+### 3. Or Use Individual Stages
 
 ```bash
-python -m autoresearch_hv list-domains
+# Plan
+chakra sutra --domain tabular_cls --version v1.0 --force
+
+# Execute
+chakra yantra --domain tabular_cls --version v1.0 --stage train --device cpu
+
+# Guard
+chakra rakshak --domain tabular_cls --version v1.0
+
+# Review
+chakra vimarsh --domain tabular_cls --version v1.0
+
+# Improve
+chakra manthan --domain tabular_cls --version v1.0
 ```
 
-```
-Name                 Display Name                             Primary Metric
---------------------------------------------------------------------------------
-hndsr_vr             HNDSR Satellite Super-Resolution         psnr_mean
-nlp_lm               NLP Language Modelling                   val_bpb
-tabular_cls          Tabular Classification                   accuracy
-```
+### 4. Traditional CLI (Still Works)
 
-### 4. Run Your First Experiment (Iris — 30 seconds)
+All original commands remain available through `python -m chakra`:
 
 ```bash
-# Scaffold version v1.0 for the tabular domain
-python -m autoresearch_hv --domain tabular_cls scaffold-version --version v1.0 --force
-
-# Run the logistic regression control baseline
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
-  --config configs/tabular_cls/v1.0_control.yaml \
-  --run-name v1.0-control --device cpu
-
-# Train the MLP (30 epochs, ~10 seconds on CPU)
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
-  --config configs/tabular_cls/v1.0_train.yaml \
-  --run-name v1.0-train --device cpu
-
-# Evaluate the trained model
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
-  --config configs/tabular_cls/v1.0_train.yaml \
-  --run-name v1.0-eval \
-  --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt \
-  --device cpu
-
-# Sync results and generate a review
-python -m autoresearch_hv --domain tabular_cls sync-run --version v1.0 --source-dir artifacts/v1.0-train
-python -m autoresearch_hv --domain tabular_cls review-run --version v1.0
-
-# Validate the version contract
-python -m autoresearch_hv --domain tabular_cls validate-version --version v1.0
-```
-
-### 5. Run the NLP Domain (Language Modelling — ~5 minutes)
-
-```bash
-# Scaffold
-python -m autoresearch_hv --domain nlp_lm scaffold-version --version v1.0 --force
-
-# Control baseline (bigram)
-python -m autoresearch_hv.domains.nlp_lm.train_runner \
-  --config configs/nlp_lm/v1.0_control.yaml --run-name v1.0-control --device cpu
-
-# Full training (GPT-nano, 5 epochs on tiny_shakespeare)
-python -m autoresearch_hv.domains.nlp_lm.train_runner \
-  --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-train --device cpu
-
-# Evaluate
-python -m autoresearch_hv.domains.nlp_lm.evaluate_runner \
-  --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-eval \
-  --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
-
-# Sync + Review + Validate
-python -m autoresearch_hv --domain nlp_lm sync-run --version v1.0 --source-dir artifacts/v1.0-train
-python -m autoresearch_hv --domain nlp_lm review-run --version v1.0
-python -m autoresearch_hv --domain nlp_lm validate-version --version v1.0
+python -m chakra list-domains
+python -m chakra --domain tabular_cls scaffold-version --version v1.0 --force
+python -m chakra --domain tabular_cls validate-version --version v1.0
 ```
 
 ---
@@ -156,204 +148,163 @@ python -m autoresearch_hv --domain nlp_lm validate-version --version v1.0
 ## Architecture
 
 ```
-src/autoresearch_hv/
-├── core/                         Domain-agnostic engine
-│   ├── interfaces.py             Protocols every domain implements (DomainLifecycleHooks)
-│   ├── domain_registry.py        Auto-discovers domains from domain.yaml manifests
-│   ├── lifecycle.py              Generic lifecycle (scaffold → sync → review → promote)
-│   ├── tracker.py                W&B tracker + NullTracker fallback
-│   └── utils.py                  Config loading, .env support, path helpers, seeding
+chakra/
+├── core/                           # Domain-agnostic engine (Chakra kernel)
+│   ├── interfaces.py               # DomainLifecycleHooks protocol
+│   ├── domain_registry.py          # Auto-discovers domains from domain.yaml
+│   ├── lifecycle.py                 # Generic scaffold → sync → review → promote
+│   ├── chakra_logger.py            # Structured stage-aware logging
+│   ├── tracker.py                  # W&B tracker + NullTracker fallback
+│   └── utils.py                    # Config loading, seeding, path helpers
 │
-├── domains/                      Pluggable research lanes
-│   ├── hndsr_vr/                 CV: satellite super-resolution (SR3, PSNR ↑)
-│   ├── nlp_lm/                   NLP: character-level LM (GPT-nano, BPB ↓)
-│   └── tabular_cls/              Tabular: classification (MLP, Accuracy ↑)
+├── domains/                        # Each domain is a self-contained plugin
+│   ├── hndsr_vr/                   # Satellite image super-resolution
+│   ├── nlp_lm/                     # Character-level language model
+│   └── tabular_cls/                # Tabular classification (Iris, Titanic)
 │
-└── cli.py                        --domain dispatch CLI
-
-configs/                          YAML configs with `inherits:` support
-├── hndsr_vr/                     base.yaml + per-version control/smoke/train
-├── nlp_lm/
-└── tabular_cls/
-
-benchmarks/                       Measured control baselines (JSON)
-programs/                         Human-owned research program docs
-tests/                            47 tests across 7 test files
+├── cli.py                          # Traditional CLI (python -m chakra)
+└── chakra_cli.py                   # Chakra CLI (chakra sutra/yantra/...)
 ```
 
-### How Domain Auto-Discovery Works
+### Chakra ↔ System Mapping
 
-```
-1. domain_registry.py scans all subpackages under domains/
-2. Each domain has a domain.yaml manifest declaring name, metrics, model kinds, etc.
-3. The CLI auto-discovers all domains — zero registration code
-4. Each domain implements the DomainLifecycleHooks protocol
-5. The generic lifecycle.py dispatches to domain hooks for all operations
-```
-
-### The Lifecycle Loop
-
-```mermaid
-graph LR
-    A[Scaffold] --> B[Configure]
-    B --> C[Control Baseline]
-    C --> D[Smoke Test]
-    D --> E[Full Training]
-    E --> F[Evaluation]
-    F --> G[Sync]
-    G --> H[Review & Roast]
-    H --> I{Promote?}
-    I -->|Yes| J[Freeze Version]
-    I -->|No| K[Fork & Iterate]
-    K --> B
-```
+| Subsystem | Chakra Role | Code |
+|-----------|-------------|------|
+| `core/lifecycle.py` | Orchestrates the cycle | `scaffold_version`, `sync_run`, `review_run` |
+| `core/chakra_logger.py` | Emits stage-aware logs | `ChakraLogger` |
+| `core/tracker.py` | Records telemetry | `WandbTracker`, `NullTracker` |
+| `core/domain_registry.py` | Discovers research lanes | `discover_domains()` |
+| `core/interfaces.py` | Defines the domain contract | `DomainLifecycleHooks` |
+| `domains/*/train_runner.py` | Yantra (Execute) — training | Per-domain subprocess |
+| `domains/*/evaluate_runner.py` | Yantra (Execute) — evaluation | Per-domain subprocess |
+| `chakra_cli.py` | Entry point for the Chakra interface | `run_aavart()` |
 
 ---
 
 ## CLI Reference
 
-```bash
-python -m autoresearch_hv [command] --domain [domain_name]
-```
+### Chakra Commands
 
-### Global Commands
+| Command | Stage | Description |
+|---------|-------|-------------|
+| `chakra sutra` | Plan | Create and freeze experiment plan (scaffold assets + configs) |
+| `chakra yantra` | Execute | Run training or evaluation (`--stage control\|smoke\|train\|eval`) |
+| `chakra rakshak` | Guard | Validate that all version files and contracts exist |
+| `chakra vimarsh` | Review | Sync training results and generate structured review |
+| `chakra manthan` | Improve | Propose bounded ablation suggestions for next iteration |
+| `chakra aavart` | Full Cycle | Run the complete Plan → Execute → Guard → Review → Improve loop |
+| `chakra list-domains` | Discovery | List all auto-discovered research domains |
+
+### Traditional Commands
 
 | Command | Description |
 |---------|-------------|
-| `list-domains` | Show all discovered research domains |
-| `domain-info --domain <name>` | Show details of a specific domain |
-
-### Lifecycle Commands (require `--domain`)
-
-| Command | Description |
-|---------|-------------|
-| `scaffold-version --version <v>` | Create notebook, doc, review, and config assets |
-| `validate-version --version <v>` | Validate a version's contract (all files exist) |
-| `push-kaggle --version <v>` | Push a notebook to Kaggle |
-| `kaggle-status --version <v>` | Check Kaggle kernel status |
-| `pull-kaggle --version <v>` | Pull Kaggle outputs into artifacts |
-| `sync-run --version <v>` | Index pulled outputs into a run manifest |
-| `review-run --version <v>` | Generate a review + roast + ablation suggestions |
-| `mirror-obsidian --version <v>` | Generate an Obsidian mirror note |
-| `next-ablation --version <v>` | Write next bounded ablation suggestions |
+| `python -m chakra list-domains` | List all domains |
+| `python -m chakra --domain D scaffold-version --version V` | Scaffold version assets |
+| `python -m chakra --domain D validate-version --version V` | Validate version contract |
+| `python -m chakra --domain D sync-run --version V` | Index results into manifest |
+| `python -m chakra --domain D review-run --version V` | Generate review and roast |
+| `python -m chakra --domain D next-ablation --version V` | Write ablation suggestions |
+| `python -m chakra --domain D push-kaggle --version V` | Push notebook to Kaggle |
+| `python -m chakra --domain D pull-kaggle --version V` | Pull Kaggle outputs |
 
 ---
 
 ## W&B Experiment Tracking
 
-AutoResearch includes full [Weights & Biases](https://wandb.ai/) integration:
+```bash
+# Create .env in repo root
+echo WANDB_API_KEY=your_key_here > .env
+```
 
-- **Online mode**: Streams metrics, configs, and artifacts to the W&B cloud in real-time
-- **Offline mode**: Logs locally, sync to W&B later via `wandb sync`
-- **Null fallback**: If `wandb` isn't installed or configured, a local `NullTracker` records everything to JSON — nothing is lost
+When a key is present, all runners stream metrics to W&B automatically. Without it, everything still works — metrics save to local JSON via `NullTracker`.
 
-### Setup
+---
 
-1. Create a `.env` file: `WANDB_API_KEY=your_key`
-2. Set `tracking.mode: online` in your config YAML (default)
-3. That's it — all train/eval runners auto-load `.env` and initialize W&B
+## Configuration System
 
-### What Gets Tracked
+Configs use YAML with an `inherits:` key for layered configuration:
 
-| Artifact | Description |
-|----------|-------------|
-| Config manifest | Full resolved YAML config as a W&B artifact |
-| Dataset split manifest | Train/val sizes, feature names, class names |
-| Epoch metrics | Loss, accuracy, BPB, perplexity (per-epoch) |
-| Best checkpoint | Saved as a W&B artifact with lineage |
-| Train/eval summaries | JSON summaries with all metrics |
+```yaml
+# configs/tabular_cls/v1.0_train.yaml
+inherits: configs/tabular_cls/base.yaml
+
+project:
+  group: v1.0-train
+
+training:
+  epochs: 30
+  checkpoint_name: v1.0_train_best.pt
+```
+
+Each version always has three config variants:
+
+| Variant | Purpose |
+|---------|---------|
+| `*_control.yaml` | Baseline model (establishes the floor) |
+| `*_smoke.yaml` | Quick pipeline sanity check (3 epochs, 5 batches) |
+| `*_train.yaml` | Full training run |
 
 ---
 
 ## Adding a New Domain
 
-Creating a new research domain requires **zero changes** to the core engine:
+Chakra is designed for zero-code-change domain addition:
 
 ```
-src/autoresearch_hv/domains/your_domain/
+src/chakra/domains/my_domain/
 ├── __init__.py
-├── domain.yaml          # Name, metrics, model kinds, entrypoints
-├── lifecycle.py         # LifecycleHooks class (implements protocol)
-├── models.py            # Your model architectures
-├── dataset.py           # Data loading and preprocessing
-├── metrics.py           # Domain-specific metric functions
-├── train_runner.py      # Training entry point with W&B tracking
-└── evaluate_runner.py   # Evaluation entry point with W&B tracking
+├── domain.yaml          # Domain manifest (name, metrics, entrypoints)
+├── lifecycle.py          # Implements DomainLifecycleHooks protocol
+├── models.py             # Domain-specific models
+├── dataset.py            # Data loading and preprocessing
+├── metrics.py            # Evaluation metrics
+├── train_runner.py       # Training script with W&B tracking
+└── evaluate_runner.py    # Evaluation script with W&B tracking
 ```
 
-Then add:
-- `configs/your_domain/base.yaml` + version configs
-- `benchmarks/your_domain_registry.json`
-- `programs/your_domain.md`
-- `tests/test_your_domain.py`
-- One line in `pyproject.toml` → `package-data`
-
-The CLI discovers your domain automatically. See [CONTRIBUTING.md](CONTRIBUTING.md) for details.
-
----
-
-## Project Layout
-
+Register in `pyproject.toml`:
+```toml
+"chakra.domains.my_domain" = ["domain.yaml"]
 ```
-.
-├── src/autoresearch_hv/           Core engine + 3 domains
-├── configs/                       YAML configs with inherits support
-│   ├── hndsr_vr/                  Satellite SR configs
-│   ├── nlp_lm/                    NLP language model configs
-│   └── tabular_cls/               Tabular classification configs
-├── data/                          Datasets (titanic.csv, tiny_shakespeare cached)
-├── benchmarks/                    Measured baseline registries (JSON)
-├── programs/                      Research program docs
-├── docs/                          Per-version run docs, design docs
-├── notebooks/versions/            Immutable Kaggle/Colab notebooks
-├── reports/
-│   ├── reviews/                   Per-version audit/roast docs
-│   └── generated/                 Auto-generated ablation suggestions
-├── tests/                         47 tests across 7 files
-├── pyproject.toml                 Build config and dependencies
-├── CONTRIBUTING.md                Dev setup & contribution guide
-└── LICENSE                        MIT
+
+Then:
+```bash
+chakra list-domains    # Your domain appears automatically
+chakra aavart --domain my_domain --version v1.0 --device cpu
 ```
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for the full tutorial.
 
 ---
 
 ## Testing
 
 ```bash
-# Run all 47 tests
 python -m pytest tests/ -v
-
-# Run a specific domain's tests
-python -m pytest tests/test_tabular_domain.py -v
-python -m pytest tests/test_nlp_domain.py -v
-
-# Quick run (quiet mode)
-python -m pytest tests/ -q
 ```
 
-| Test File | Tests | Coverage |
-|-----------|-------|----------|
-| `test_core.py` | 16 | Domain registry, config loading, utils, seeding |
-| `test_tabular_domain.py` | 9 | Auto-discovery, models, dataset, metrics, lifecycle |
+47 tests across all domains and core infrastructure:
+
+| Suite | Tests | Coverage |
+|-------|-------|----------|
+| `test_core.py` | 16 | Config, utils, seeding, registry |
+| `test_tabular_domain.py` | 9 | Discovery, protocol, models, dataset, metrics |
 | `test_nlp_domain.py` | 6 | GPT-nano, bigram, dataset, metrics |
-| `test_domain_registry.py` | 5 | Multi-domain discovery, manifest validation |
-| `test_cli_dispatch.py` | 3 | CLI argument parsing, domain dispatch |
+| `test_domain_registry.py` | 5 | Multi-domain discovery, manifests |
 | `test_runtime_contract.py` | 6 | Path resolution, workspace isolation |
-| `test_lifecycle_review.py` | 1 | Full sync → review pipeline (monkeypatched) |
-| `test_notebook_contract.py` | 1 | Notebook structure validation |
+| `test_cli_dispatch.py` | 3 | CLI argument parsing |
+| `test_lifecycle_review.py` | 1 | Full sync → review pipeline |
+| `test_notebook_contract.py` | 1 | Notebook JSON structure |
 
 ---
 
 ## Inspirations
 
-This project builds on ideas from:
-
-- **[Karpathy's autoresearch](https://github.com/karpathy/autoresearch)** — The autonomous iteration loop with a frozen `program.md`
-- **[Sakana AI's AI Scientist](https://github.com/sakanaai/ai-scientist)** — Automated scientific discovery (lessons learned from its [42% failure rate](https://arxiv.org/html/2502.14297v2))
+- **Chakra** (चक्र) — The wheel that represents cyclical, self-sustaining motion
+- **[Sakana AI's AI Scientist](https://github.com/sakanaai/ai-scientist)** — Automated scientific discovery
 - **[AutoKaggle](https://github.com/multimodal-art-projection/AutoKaggle)** — Multi-agent Kaggle orchestration
 - **[W&B Experiment Tracking](https://wandb.ai/)** — MLOps telemetry backbone
-
-See [Autonomous ML Project Pipeline Design](docs/Autonomous%20ML%20Project%20Pipeline%20Design.md) for the full architectural blueprint.
 
 ---
 

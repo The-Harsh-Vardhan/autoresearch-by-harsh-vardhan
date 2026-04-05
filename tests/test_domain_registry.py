@@ -1,6 +1,6 @@
 """Tests for the domain registry and manifest loading."""
 
-from autoresearch_hv.core.domain_registry import DomainManifest, discover_domains, get_domain
+from chakra.core.domain_registry import DomainManifest, discover_domains, get_domain
 
 
 def test_discover_finds_both_domains():
@@ -16,7 +16,7 @@ def test_hndsr_manifest_fields():
     assert manifest.metric_direction == "higher_is_better"
     assert "sr3" in manifest.model_kinds
     assert "bicubic" in manifest.model_kinds
-    assert manifest.entrypoints["lifecycle"] == "autoresearch_hv.domains.hndsr_vr.lifecycle"
+    assert manifest.entrypoints["lifecycle"] == "chakra.domains.hndsr_vr.lifecycle"
 
 
 def test_nlp_manifest_fields():
@@ -26,7 +26,7 @@ def test_nlp_manifest_fields():
     assert manifest.metric_direction == "lower_is_better"
     assert "gpt_nano" in manifest.model_kinds
     assert "bigram" in manifest.model_kinds
-    assert manifest.entrypoints["lifecycle"] == "autoresearch_hv.domains.nlp_lm.lifecycle"
+    assert manifest.entrypoints["lifecycle"] == "chakra.domains.nlp_lm.lifecycle"
 
 
 def test_unknown_domain_raises_key_error():

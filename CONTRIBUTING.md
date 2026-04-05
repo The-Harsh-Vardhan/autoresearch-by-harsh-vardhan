@@ -45,7 +45,7 @@ Adding a new research domain requires **zero changes** to the core engine:
 ### 1. Create the domain package
 
 ```
-src/autoresearch_hv/domains/your_domain/
+src/chakra/domains/your_domain/
 ├── __init__.py
 ├── domain.yaml          # Auto-discovery manifest
 ├── lifecycle.py         # LifecycleHooks class
@@ -71,9 +71,9 @@ benchmark_registry: benchmarks/your_domain_registry.json
 config_dir: configs/your_domain
 programs_doc: programs/your_domain.md
 entrypoints:
-  lifecycle: autoresearch_hv.domains.your_domain.lifecycle
-  train_runner: autoresearch_hv.domains.your_domain.train_runner
-  evaluate_runner: autoresearch_hv.domains.your_domain.evaluate_runner
+  lifecycle: chakra.domains.your_domain.lifecycle
+  train_runner: chakra.domains.your_domain.train_runner
+  evaluate_runner: chakra.domains.your_domain.evaluate_runner
 ```
 
 ### 3. Implement `LifecycleHooks` in `lifecycle.py`
@@ -83,8 +83,8 @@ Your hooks class must implement the `DomainLifecycleHooks` protocol (see `core/i
 ### 4. Wire W&B tracking in runners
 
 ```python
-from autoresearch_hv.core.tracker import init_tracker
-from autoresearch_hv.core.utils import load_dotenv
+from chakra.core.tracker import init_tracker
+from chakra.core.utils import load_dotenv
 
 def main():
     load_dotenv()                          # Load .env credentials
@@ -110,7 +110,7 @@ def main():
 
 ```bash
 # Should show your domain
-python -m autoresearch_hv list-domains
+python -m chakra list-domains
 
 # All tests should pass
 python -m pytest tests/ -v
@@ -139,7 +139,7 @@ Use conventional commits:
 ## Checklist for PRs
 
 - [ ] All tests pass (`python -m pytest tests/ -q`)
-- [ ] New domain auto-discovered (`python -m autoresearch_hv list-domains`)
+- [ ] New domain auto-discovered (`python -m chakra list-domains`)
 - [ ] Version contract validates (`validate-version`)
 - [ ] Configs use `inherits:` pattern from `base.yaml`
 - [ ] W&B tracking wired via `init_tracker()` + `load_dotenv()`

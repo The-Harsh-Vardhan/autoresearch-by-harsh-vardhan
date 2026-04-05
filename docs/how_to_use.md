@@ -55,7 +55,7 @@ pip install -e ".[dev]"
 ### Verify Installation
 
 ```bash
-python -m autoresearch_hv list-domains
+python -m chakra list-domains
 ```
 
 You should see output like:
@@ -77,7 +77,7 @@ If you see all three domains, you're ready to go.
 ```
 autoresearch-by-harsh-vardhan/
 │
-├── src/autoresearch_hv/               # Python source code
+├── src/chakra/               # Python source code
 │   ├── core/                          # Domain-agnostic engine (never touch for new domains)
 │   │   ├── interfaces.py              # DomainLifecycleHooks protocol
 │   │   ├── domain_registry.py         # Auto-discovers domains
@@ -166,7 +166,7 @@ The fastest experiment uses the **Tabular Classification** domain with the Iris 
 ### Step 1: Scaffold
 
 ```bash
-python -m autoresearch_hv --domain tabular_cls scaffold-version --version v1.0 --force
+python -m chakra --domain tabular_cls scaffold-version --version v1.0 --force
 ```
 
 This generates the notebook, doc, review template, and config files for `v1.0`.
@@ -174,7 +174,7 @@ This generates the notebook, doc, review template, and config files for `v1.0`.
 ### Step 2: Control Baseline
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v1.0_control.yaml \
   --run-name v1.0-control \
   --device cpu
@@ -185,7 +185,7 @@ python -m autoresearch_hv.domains.tabular_cls.train_runner \
 ### Step 3: Smoke Test
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v1.0_smoke.yaml \
   --run-name v1.0-smoke \
   --device cpu
@@ -196,7 +196,7 @@ python -m autoresearch_hv.domains.tabular_cls.train_runner \
 ### Step 4: Full Training
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.train_runner \
+python -m chakra.domains.tabular_cls.train_runner \
   --config configs/tabular_cls/v1.0_train.yaml \
   --run-name v1.0-train \
   --device cpu
@@ -207,7 +207,7 @@ python -m autoresearch_hv.domains.tabular_cls.train_runner \
 ### Step 5: Evaluate
 
 ```bash
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
+python -m chakra.domains.tabular_cls.evaluate_runner \
   --config configs/tabular_cls/v1.0_train.yaml \
   --run-name v1.0-eval \
   --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt \
@@ -219,7 +219,7 @@ python -m autoresearch_hv.domains.tabular_cls.evaluate_runner \
 ### Step 6: Sync Results
 
 ```bash
-python -m autoresearch_hv --domain tabular_cls sync-run \
+python -m chakra --domain tabular_cls sync-run \
   --version v1.0 \
   --source-dir artifacts/v1.0-train
 ```
@@ -229,7 +229,7 @@ This indexes training outputs into a structured run manifest at `artifacts/runs/
 ### Step 7: Review
 
 ```bash
-python -m autoresearch_hv --domain tabular_cls review-run --version v1.0
+python -m chakra --domain tabular_cls review-run --version v1.0
 ```
 
 Generates findings, metric deltas against the benchmark baseline, ablation suggestions, and a "roast" at `reports/reviews/v1.0_Tabular_CLS.review.md`.
@@ -237,7 +237,7 @@ Generates findings, metric deltas against the benchmark baseline, ablation sugge
 ### Step 8: Validate
 
 ```bash
-python -m autoresearch_hv --domain tabular_cls validate-version --version v1.0
+python -m chakra --domain tabular_cls validate-version --version v1.0
 ```
 
 **Output:** `v1.0 contract passed for domain 'tabular_cls'.`
@@ -429,12 +429,12 @@ After a run with `mode: online`, go to your W&B dashboard:
 
 ## 8. CLI Reference
 
-The CLI entrypoint is `python -m autoresearch_hv`.
+The CLI entrypoint is `python -m chakra`.
 
 ### Global Options
 
 ```bash
-python -m autoresearch_hv [--domain DOMAIN_NAME] COMMAND [OPTIONS]
+python -m chakra [--domain DOMAIN_NAME] COMMAND [OPTIONS]
 ```
 
 `--domain` is required for all lifecycle commands.
@@ -443,10 +443,10 @@ python -m autoresearch_hv [--domain DOMAIN_NAME] COMMAND [OPTIONS]
 
 ```bash
 # List all auto-discovered domains
-python -m autoresearch_hv list-domains
+python -m chakra list-domains
 
 # Show detailed info about a domain
-python -m autoresearch_hv --domain tabular_cls domain-info
+python -m chakra --domain tabular_cls domain-info
 ```
 
 ### Lifecycle Commands
@@ -474,11 +474,11 @@ Runners are invoked directly via Python modules, not through the CLI:
 
 ```bash
 # Training
-python -m autoresearch_hv.domains.<domain>.train_runner \
+python -m chakra.domains.<domain>.train_runner \
   --config <path> --run-name <name> [--device cpu|cuda]
 
 # Evaluation
-python -m autoresearch_hv.domains.<domain>.evaluate_runner \
+python -m chakra.domains.<domain>.evaluate_runner \
   --config <path> --run-name <name> --checkpoint <path> [--device cpu|cuda]
 ```
 
@@ -499,24 +499,24 @@ python -m autoresearch_hv.domains.<domain>.evaluate_runner \
 **Iris (v1.0):**
 ```bash
 # Full lifecycle
-python -m autoresearch_hv --domain tabular_cls scaffold-version --version v1.0 --force
-python -m autoresearch_hv.domains.tabular_cls.train_runner --config configs/tabular_cls/v1.0_control.yaml --run-name v1.0-control --device cpu
-python -m autoresearch_hv.domains.tabular_cls.train_runner --config configs/tabular_cls/v1.0_train.yaml --run-name v1.0-train --device cpu
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner --config configs/tabular_cls/v1.0_train.yaml --run-name v1.0-eval --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
-python -m autoresearch_hv --domain tabular_cls sync-run --version v1.0 --source-dir artifacts/v1.0-train
-python -m autoresearch_hv --domain tabular_cls review-run --version v1.0
-python -m autoresearch_hv --domain tabular_cls validate-version --version v1.0
+python -m chakra --domain tabular_cls scaffold-version --version v1.0 --force
+python -m chakra.domains.tabular_cls.train_runner --config configs/tabular_cls/v1.0_control.yaml --run-name v1.0-control --device cpu
+python -m chakra.domains.tabular_cls.train_runner --config configs/tabular_cls/v1.0_train.yaml --run-name v1.0-train --device cpu
+python -m chakra.domains.tabular_cls.evaluate_runner --config configs/tabular_cls/v1.0_train.yaml --run-name v1.0-eval --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
+python -m chakra --domain tabular_cls sync-run --version v1.0 --source-dir artifacts/v1.0-train
+python -m chakra --domain tabular_cls review-run --version v1.0
+python -m chakra --domain tabular_cls validate-version --version v1.0
 ```
 
 **Titanic (v2.0):**
 ```bash
-python -m autoresearch_hv --domain tabular_cls scaffold-version --version v2.0 --parent v1.0 --force
-python -m autoresearch_hv.domains.tabular_cls.train_runner --config configs/tabular_cls/v2.0_control.yaml --run-name v2.0-control --device cpu
-python -m autoresearch_hv.domains.tabular_cls.train_runner --config configs/tabular_cls/v2.0_train.yaml --run-name v2.0-train --device cpu
-python -m autoresearch_hv.domains.tabular_cls.evaluate_runner --config configs/tabular_cls/v2.0_train.yaml --run-name v2.0-eval --checkpoint artifacts/v2.0-train/checkpoints/v2.0_train_best.pt --device cpu
-python -m autoresearch_hv --domain tabular_cls sync-run --version v2.0 --source-dir artifacts/v2.0-train
-python -m autoresearch_hv --domain tabular_cls review-run --version v2.0
-python -m autoresearch_hv --domain tabular_cls validate-version --version v2.0
+python -m chakra --domain tabular_cls scaffold-version --version v2.0 --parent v1.0 --force
+python -m chakra.domains.tabular_cls.train_runner --config configs/tabular_cls/v2.0_control.yaml --run-name v2.0-control --device cpu
+python -m chakra.domains.tabular_cls.train_runner --config configs/tabular_cls/v2.0_train.yaml --run-name v2.0-train --device cpu
+python -m chakra.domains.tabular_cls.evaluate_runner --config configs/tabular_cls/v2.0_train.yaml --run-name v2.0-eval --checkpoint artifacts/v2.0-train/checkpoints/v2.0_train_best.pt --device cpu
+python -m chakra --domain tabular_cls sync-run --version v2.0 --source-dir artifacts/v2.0-train
+python -m chakra --domain tabular_cls review-run --version v2.0
+python -m chakra --domain tabular_cls validate-version --version v2.0
 ```
 
 ---
@@ -533,13 +533,13 @@ python -m autoresearch_hv --domain tabular_cls validate-version --version v2.0
 
 ```bash
 # Full lifecycle
-python -m autoresearch_hv --domain nlp_lm scaffold-version --version v1.0 --force
-python -m autoresearch_hv.domains.nlp_lm.train_runner --config configs/nlp_lm/v1.0_control.yaml --run-name v1.0-control --device cpu
-python -m autoresearch_hv.domains.nlp_lm.train_runner --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-train --device cpu
-python -m autoresearch_hv.domains.nlp_lm.evaluate_runner --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-eval --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
-python -m autoresearch_hv --domain nlp_lm sync-run --version v1.0 --source-dir artifacts/v1.0-train
-python -m autoresearch_hv --domain nlp_lm review-run --version v1.0
-python -m autoresearch_hv --domain nlp_lm validate-version --version v1.0
+python -m chakra --domain nlp_lm scaffold-version --version v1.0 --force
+python -m chakra.domains.nlp_lm.train_runner --config configs/nlp_lm/v1.0_control.yaml --run-name v1.0-control --device cpu
+python -m chakra.domains.nlp_lm.train_runner --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-train --device cpu
+python -m chakra.domains.nlp_lm.evaluate_runner --config configs/nlp_lm/v1.0_train.yaml --run-name v1.0-eval --checkpoint artifacts/v1.0-train/checkpoints/v1.0_train_best.pt --device cpu
+python -m chakra --domain nlp_lm sync-run --version v1.0 --source-dir artifacts/v1.0-train
+python -m chakra --domain nlp_lm review-run --version v1.0
+python -m chakra --domain nlp_lm validate-version --version v1.0
 ```
 
 > **Note:** NLP training takes ~5 minutes on CPU. Use `--device cuda` if you have a GPU.
@@ -569,7 +569,7 @@ AutoResearch is designed to be extended. Adding a new domain requires **zero cha
 **1. Create the domain package:**
 
 ```
-src/autoresearch_hv/domains/my_domain/
+src/chakra/domains/my_domain/
 ├── __init__.py
 ├── domain.yaml
 ├── lifecycle.py
@@ -593,9 +593,9 @@ benchmark_registry: benchmarks/my_domain_registry.json
 config_dir: configs/my_domain
 programs_doc: programs/my_domain.md
 entrypoints:
-  lifecycle: autoresearch_hv.domains.my_domain.lifecycle
-  train_runner: autoresearch_hv.domains.my_domain.train_runner
-  evaluate_runner: autoresearch_hv.domains.my_domain.evaluate_runner
+  lifecycle: chakra.domains.my_domain.lifecycle
+  train_runner: chakra.domains.my_domain.train_runner
+  evaluate_runner: chakra.domains.my_domain.evaluate_runner
 ```
 
 **3. Implement `LifecycleHooks` in `lifecycle.py`:**
@@ -621,8 +621,8 @@ Use `tabular_cls/lifecycle.py` as your template — it's the simplest complete i
 **4. Wire W&B tracking in your runners:**
 
 ```python
-from autoresearch_hv.core.tracker import init_tracker
-from autoresearch_hv.core.utils import load_dotenv, describe_run_dirs
+from chakra.core.tracker import init_tracker
+from chakra.core.utils import load_dotenv, describe_run_dirs
 
 def main():
     load_dotenv()
@@ -660,7 +660,7 @@ programs/my_domain.md
 
 ```toml
 [tool.setuptools.package-data]
-"autoresearch_hv.domains.my_domain" = ["domain.yaml"]
+"chakra.domains.my_domain" = ["domain.yaml"]
 ```
 
 **7. Add tests:**
@@ -672,7 +672,7 @@ tests/test_my_domain.py
 **8. Verify:**
 
 ```bash
-python -m autoresearch_hv list-domains   # Should show your domain
+python -m chakra list-domains   # Should show your domain
 python -m pytest tests/test_my_domain.py -v
 ```
 
@@ -717,7 +717,7 @@ python -m pytest tests/ -q
 
 ## 12. Troubleshooting
 
-### "No module named 'autoresearch_hv'"
+### "No module named 'chakra'"
 
 You need to install the package:
 ```bash
@@ -788,17 +788,17 @@ inherits: base.yaml
 ```bash
 # ---- Setup ----
 pip install -e ".[dev]"
-python -m autoresearch_hv list-domains
+python -m chakra list-domains
 
 # ---- Lifecycle (replace DOMAIN and VERSION) ----
-python -m autoresearch_hv --domain DOMAIN scaffold-version --version VERSION --force
-python -m autoresearch_hv.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_control.yaml --run-name VERSION-control --device cpu
-python -m autoresearch_hv.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_smoke.yaml --run-name VERSION-smoke --device cpu
-python -m autoresearch_hv.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_train.yaml --run-name VERSION-train --device cpu
-python -m autoresearch_hv.domains.DOMAIN.evaluate_runner --config configs/DOMAIN/VERSION_train.yaml --run-name VERSION-eval --checkpoint artifacts/VERSION-train/checkpoints/VERSION_train_best.pt --device cpu
-python -m autoresearch_hv --domain DOMAIN sync-run --version VERSION --source-dir artifacts/VERSION-train
-python -m autoresearch_hv --domain DOMAIN review-run --version VERSION
-python -m autoresearch_hv --domain DOMAIN validate-version --version VERSION
+python -m chakra --domain DOMAIN scaffold-version --version VERSION --force
+python -m chakra.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_control.yaml --run-name VERSION-control --device cpu
+python -m chakra.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_smoke.yaml --run-name VERSION-smoke --device cpu
+python -m chakra.domains.DOMAIN.train_runner --config configs/DOMAIN/VERSION_train.yaml --run-name VERSION-train --device cpu
+python -m chakra.domains.DOMAIN.evaluate_runner --config configs/DOMAIN/VERSION_train.yaml --run-name VERSION-eval --checkpoint artifacts/VERSION-train/checkpoints/VERSION_train_best.pt --device cpu
+python -m chakra --domain DOMAIN sync-run --version VERSION --source-dir artifacts/VERSION-train
+python -m chakra --domain DOMAIN review-run --version VERSION
+python -m chakra --domain DOMAIN validate-version --version VERSION
 
 # ---- Testing ----
 python -m pytest tests/ -v
