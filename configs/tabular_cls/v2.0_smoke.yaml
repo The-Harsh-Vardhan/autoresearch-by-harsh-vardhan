@@ -1,0 +1,22 @@
+inherits: configs/tabular_cls/base.yaml
+
+project:
+  group: v2.0-smoke
+  tags: [tabular, classification, titanic, smoke, mlp, v2.0]
+
+runtime:
+  version: v2.0
+  lineage: scratch
+  parent: v1.0
+
+data:
+  dataset: titanic
+  data_file: data/titanic.csv
+  val_split: 0.2
+  batch_size: 32
+
+training:
+  epochs: 3
+  max_train_batches: 5
+  max_val_batches: 3
+  checkpoint_name: v2.0_smoke_best.pt

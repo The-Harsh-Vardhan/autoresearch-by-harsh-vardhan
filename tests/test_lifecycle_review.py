@@ -26,7 +26,6 @@ def test_sync_review_and_mirror_pipeline(monkeypatch):
     import autoresearch_hv.hndsr_vr.lifecycle as lifecycle
     import autoresearch_hv.hndsr_vr.utils as utils
     from autoresearch_hv.hndsr_vr.lifecycle import mirror_obsidian, next_ablation, review_run, sync_run
-    from autoresearch_hv.hndsr_vr.utils import read_json
 
     # The shim lifecycle wraps core lifecycle with partial(domain='hndsr_vr')
     # For this test we need to monkeypatch the REPO_ROOT in core modules
@@ -37,6 +36,10 @@ def test_sync_review_and_mirror_pipeline(monkeypatch):
     temp_root = _fresh_dir("lifecycle-root").resolve()
     monkeypatch.setattr(core_utils, "REPO_ROOT", temp_root)
     monkeypatch.setattr(core_lifecycle, "REPO_ROOT", temp_root)
+
+    # The domain module imports REPO_ROOT at import time, so we must patch it there too
+    from autoresearch_hv.domains.hndsr_vr import lifecycle as domain_lifecycle
+    monkeypatch.setattr(domain_lifecycle, "REPO_ROOT", temp_root)
 
     benchmark_dir = temp_root / "benchmarks"
     benchmark_dir.mkdir(parents=True, exist_ok=True)
@@ -76,8 +79,8 @@ def test_sync_review_and_mirror_pipeline(monkeypatch):
     mirror_obsidian(version, output_dir=str(mirror_root))
     next_ablation(version)
 
-    manifest = read_json(f"artifacts/runs/{version}/run_manifest.json")
-    review_payload = read_json(f"reports/reviews/{version}_HNDSR.review.json")
+    manifest = json.loads((temp_root / f"artifacts/runs/{version}/run_manifest.json").read_text(encoding="utf-8"))
+    review_payload = json.loads((temp_root / f"reports/reviews/{version}_HNDSR.review.json").read_text(encoding="utf-8"))
     mirror_note = (mirror_root / f"{version}_HNDSR.md").read_text(encoding="utf-8")
     ablation_note = (temp_root / "reports" / "generated" / f"{version}_HNDSR.next_ablation.md").read_text(encoding="utf-8")
 

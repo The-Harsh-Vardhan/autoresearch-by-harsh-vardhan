@@ -1,0 +1,13 @@
+{
+  "lane": "Tabular Classification",
+  "control_baselines": {
+    "iris_logistic_untrained": {
+      "dataset": "iris",
+      "val_accuracy": 0.1667,
+      "val_f1": 0.0,
+      "val_loss": 1.1,
+      "source": "v1.0-control run on 2026-04-05 (logistic, 4 features, 3 classes, untrained)"
+    }
+  },
+  "paper_targets": []
+}

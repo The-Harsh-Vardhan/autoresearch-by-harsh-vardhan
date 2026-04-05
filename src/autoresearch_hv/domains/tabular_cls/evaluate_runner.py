@@ -1,4 +1,4 @@
-"""Evaluate a trained NLP language model."""
+"""Evaluate a trained tabular classification model."""
 
 from __future__ import annotations
 
@@ -6,37 +6,40 @@ import argparse
 import time
 
 import torch
-import torch.nn.functional as F
 from tqdm import tqdm
 
 from autoresearch_hv.core.tracker import init_tracker
-from autoresearch_hv.core.utils import describe_run_dirs, get_device, load_config, load_dotenv, prepare_workspace_temp, set_seed, write_json
+from autoresearch_hv.core.utils import (
+    describe_run_dirs,
+    get_device,
+    load_config,
+    load_dotenv,
+    prepare_workspace_temp,
+    set_seed,
+    write_json,
+)
 
 from .dataset import build_loaders, build_split_manifest
-from .metrics import calculate_bpb, calculate_cross_entropy, calculate_perplexity
-from .models import BigramBaseline, GPTNano
+from .metrics import calculate_accuracy, calculate_cross_entropy, calculate_f1
+from .models import LogisticBaseline, SmallMLP
 
 
-def build_model(config: dict, vocab_size: int, seq_len: int, device: torch.device, checkpoint: str | None) -> torch.nn.Module | None:
-    """Instantiate and load a checkpointed model."""
+def build_model(config: dict, num_features: int, num_classes: int,
+                device: torch.device, checkpoint: str | None) -> torch.nn.Module:
+    """Instantiate and optionally load a checkpointed model."""
     kind = config["model"]["kind"]
-    if kind == "bigram":
-        if checkpoint is None:
-            return BigramBaseline(vocab_size=vocab_size).to(device)
-        model = BigramBaseline(vocab_size=vocab_size).to(device)
-    elif kind == "gpt_nano":
-        if checkpoint is None:
-            raise ValueError("A checkpoint is required for GPTNano evaluation.")
-        model = GPTNano(
-            vocab_size=vocab_size,
-            seq_len=seq_len,
-            n_embd=config["model"].get("n_embd", 64),
-            n_head=config["model"].get("n_head", 4),
-            n_layer=config["model"].get("n_layer", 4),
-            dropout=0.0,  # No dropout during evaluation
-        ).to(device)
+    if kind == "logistic":
+        model = LogisticBaseline(num_features, num_classes)
+    elif kind == "mlp":
+        model = SmallMLP(
+            num_features=num_features,
+            num_classes=num_classes,
+            hidden_dim=config["model"].get("hidden_dim", 64),
+            dropout=0.0,  # no dropout at eval time
+        )
     else:
         raise ValueError(f"Unknown model kind: {kind}")
+    model = model.to(device)
     if checkpoint:
         payload = torch.load(checkpoint, map_location=device, weights_only=False)
         model.load_state_dict(payload["model"])
@@ -45,7 +48,7 @@ def build_model(config: dict, vocab_size: int, seq_len: int, device: torch.devic
 
 
 def evaluate(config: dict, run_name: str, device: torch.device, checkpoint: str | None) -> dict[str, object]:
-    """Evaluate a language model on the validation set."""
+    """Evaluate a trained model on the validation set."""
     dirs = describe_run_dirs(config, run_name)
     tracker = init_tracker(config, run_name, dirs["tracker"])
     bundle = build_loaders(config, seed=config["seed"])
@@ -59,23 +62,22 @@ def evaluate(config: dict, run_name: str, device: torch.device, checkpoint: str 
     tracker.log_file_artifact(f"{run_name}-config", config_manifest_path, "config")
     tracker.log_file_artifact(f"{run_name}-dataset-manifest", dataset_manifest_path, "dataset_manifest")
 
-    model = build_model(config, bundle.vocab_size, bundle.seq_len, device, checkpoint)
-    limit = config["evaluation"]["sample_limit"]
+    model = build_model(config, bundle.num_features, bundle.num_classes, device, checkpoint)
+    sample_limit = config["evaluation"]["sample_limit"]
     total_loss = 0.0
-    total_bpb = 0.0
-    total_ppl = 0.0
+    total_acc = 0.0
+    total_f1 = 0.0
     count = 0
 
     with torch.no_grad():
-        for batch_idx, batch in enumerate(tqdm(bundle.val_loader, desc="Evaluating", leave=False)):
-            if batch_idx >= limit:
+        for batch_idx, (X, y) in enumerate(tqdm(bundle.val_loader, desc="Evaluating", leave=False)):
+            if batch_idx >= sample_limit:
                 break
-            x = batch["input_ids"].to(device)
-            y = batch["target_ids"].to(device)
-            logits = model(x)
+            X, y = X.to(device), y.to(device)
+            logits = model(X)
             total_loss += calculate_cross_entropy(logits, y)
-            total_bpb += calculate_bpb(logits, y)
-            total_ppl += calculate_perplexity(logits, y)
+            total_acc += calculate_accuracy(logits, y)
+            total_f1 += calculate_f1(logits, y, bundle.num_classes)
             count += 1
 
     summary = {
@@ -83,13 +85,13 @@ def evaluate(config: dict, run_name: str, device: torch.device, checkpoint: str 
         "version": version,
         "model_kind": config["model"]["kind"],
         "dataset_name": bundle.dataset_name,
-        "vocab_size": bundle.vocab_size,
-        "seq_len": bundle.seq_len,
+        "num_features": bundle.num_features,
+        "num_classes": bundle.num_classes,
         "device": str(device),
         "checkpoint": checkpoint,
         "val_loss": total_loss / max(count, 1),
-        "val_bpb": total_bpb / max(count, 1),
-        "val_perplexity": total_ppl / max(count, 1),
+        "val_accuracy": total_acc / max(count, 1),
+        "val_f1": total_f1 / max(count, 1),
         "num_samples": count,
         "tracker_backend": tracker.backend,
         "tracker_url": tracker.run_url,
@@ -102,7 +104,7 @@ def evaluate(config: dict, run_name: str, device: torch.device, checkpoint: str 
 
 
 def parse_args() -> argparse.Namespace:
-    parser = argparse.ArgumentParser(description="Evaluate NLP language model")
+    parser = argparse.ArgumentParser(description="Evaluate tabular classification model")
     parser.add_argument("--config", required=True, help="Path to the YAML config file")
     parser.add_argument("--run-name", default=None, help="Optional explicit run name")
     parser.add_argument("--device", default=None, help="Optional torch device override")
@@ -119,7 +121,9 @@ def main() -> None:
     run_name = args.run_name or f"{config['project']['group']}-eval-{time.strftime('%Y%m%d-%H%M%S')}"
     device = get_device(args.device)
     summary = evaluate(config, run_name, device, args.checkpoint)
-    print(f"Evaluation complete: BPB={summary['val_bpb']:.4f}, Perplexity={summary['val_perplexity']:.2f}")
+    print(f"Evaluation complete: Accuracy={summary['val_accuracy']:.2%}, F1={summary['val_f1']:.4f}")
+    if summary.get("tracker_url"):
+        print(f"W&B run: {summary['tracker_url']}")
 
 
 if __name__ == "__main__":

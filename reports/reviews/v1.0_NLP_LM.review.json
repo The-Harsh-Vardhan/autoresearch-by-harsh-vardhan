@@ -1,0 +1,27 @@
+{
+  "benchmark_delta": {
+    "bpb_delta": 0.0
+  },
+  "decision": "patch in place",
+  "domain": "nlp_lm",
+  "eval_summary": null,
+  "findings": [
+    {
+      "message": "W&B URL is missing.",
+      "severity": "medium"
+    },
+    {
+      "message": "No evaluation summary found.",
+      "severity": "critical"
+    }
+  ],
+  "next_ablations": [
+    "v1.1: fix missing evaluation before any model change"
+  ],
+  "roast": [
+    "A character-level LM that cannot beat a bigram is not a model, it is a random number generator.",
+    "Training for 5 epochs on tiny data is not research, it is a unit test."
+  ],
+  "version": "v1.0",
+  "wandb_url": null
+}

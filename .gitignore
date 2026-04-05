@@ -17,6 +17,10 @@ Thumbs.db
 wandb/
 pytest-cache-files-*
 
+# Credentials and local overrides
+.env
+configs/*/local.yaml
+
 # Artifacts (tracked structure, not contents)
 artifacts/*
 !artifacts/.gitkeep

@@ -1,15 +1,10 @@
 {
-  "code_file": "vR.1_HNDSR.ipynb",
-  "competition_sources": [],
-  "dataset_sources": [
-    "brsdincer/4x-satellite-image-super-resolution"
-  ],
-  "enable_gpu": true,
+  "code_file": "v1.0_Tabular_CLS.ipynb",
+  "enable_gpu": false,
   "enable_internet": true,
-  "id": "INSERT_KAGGLE_USERNAME/vr1-hndsr",
+  "id": "INSERT_KAGGLE_USERNAME/tabular-cls-v1",
   "is_private": true,
-  "kernel_sources": [],
   "kernel_type": "notebook",
   "language": "python",
-  "title": "vR.1 HNDSR Scratch Baseline"
+  "title": "Tabular Classification v1.0"
 }

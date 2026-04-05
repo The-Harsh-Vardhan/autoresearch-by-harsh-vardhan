@@ -27,6 +27,7 @@ dependencies = [
   "pillow>=10.0.0",
   "pyyaml>=6.0.0",
   "scikit-image>=0.22.0",
+  "scikit-learn>=1.4.0",
   "torch>=2.2.0",
   "torchvision>=0.17.0",
   "tqdm>=4.66.0",
@@ -50,6 +51,7 @@ where = ["src"]
 [tool.setuptools.package-data]
 "autoresearch_hv.domains.hndsr_vr" = ["domain.yaml"]
 "autoresearch_hv.domains.nlp_lm" = ["domain.yaml"]
+"autoresearch_hv.domains.tabular_cls" = ["domain.yaml"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

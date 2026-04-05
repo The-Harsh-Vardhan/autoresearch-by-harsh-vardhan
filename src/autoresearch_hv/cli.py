@@ -104,6 +104,8 @@ def _require_domain(args: argparse.Namespace) -> str:
 
 
 def main() -> int:
+    from .core.utils import load_dotenv
+    load_dotenv()
     args = build_parser().parse_args()
     domain = _require_domain(args)
 

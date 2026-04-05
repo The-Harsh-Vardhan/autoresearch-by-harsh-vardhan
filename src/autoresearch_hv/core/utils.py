@@ -19,6 +19,19 @@ except Exception:
 REPO_ROOT = Path(__file__).resolve().parents[3]
 
 
+def load_dotenv(root: Path | None = None) -> None:
+    """Load key=value pairs from a .env file into os.environ (no external dep)."""
+    env_path = (root or REPO_ROOT) / ".env"
+    if not env_path.exists():
+        return
+    for line in env_path.read_text(encoding="utf-8").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#") or "=" not in line:
+            continue
+        key, _, value = line.partition("=")
+        os.environ.setdefault(key.strip(), value.strip())
+
+
 def repo_path(value: str | Path) -> Path:
     """Resolve a repo-relative path without guessing from cwd."""
     candidate = Path(value)

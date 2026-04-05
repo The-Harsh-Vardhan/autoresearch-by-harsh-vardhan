@@ -3,12 +3,12 @@ project:
   name: autoresearch-by-harsh-vardhan
   group: v1.0-control
   tags:
-  - phase1
-  - nlp
+  - tabular
+  - classification
   - v1.0
   - scratch
   - control
-  - bigram
+  - logistic
 runtime:
   version: v1.0
   lineage: scratch
@@ -16,36 +16,27 @@ runtime:
 paths:
   artifact_root: artifacts
   report_root: reports
-  datasets:
-    tiny_shakespeare:
-      text_file: data/tiny_shakespeare.txt
-dataset:
-  name: tiny_shakespeare
 data:
-  seq_len: 128
+  dataset: iris
+  val_split: 0.2
   batch_size: 32
-  val_split: 0.1
-  train_limit: null
-  val_limit: null
 tracking:
   enabled: true
   mode: online
   project: autoresearch-by-harsh-vardhan
   entity: null
-  notes: NLP LM research lane
+  notes: Tabular classification research lane
 model:
-  kind: bigram
-  n_embd: 64
-  n_head: 4
-  n_layer: 4
-  dropout: 0.1
+  kind: logistic
+  hidden_dim: 64
+  dropout: 0.2
 training:
   epochs: 1
-  lr: 0.0003
-  weight_decay: 0.01
-  grad_clip: 1.0
+  lr: 0.001
+  weight_decay: 0.0001
   max_train_batches: 0
   max_val_batches: null
   checkpoint_name: v1.0_control.pt
 evaluation:
-  sample_limit: 50
+  sample_limit: 100
+  save_limit: 8
