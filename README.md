@@ -1,3 +1,7 @@
+<p align="center">
+  <img src="CHAKRA%20Logo.png" alt="Chakra Logo" width="200"/>
+</p>
+
 # Chakra — Autonomous Research System
 
 [![MIT License](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
