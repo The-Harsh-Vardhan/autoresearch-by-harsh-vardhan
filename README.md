@@ -1,5 +1,5 @@
 <p align="center">
-  <img src="assets/chakra_logo_white.png" alt="Chakra Logo" width="200"/>
+  <img src="https://raw.githubusercontent.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System/main/assets/chakra_logo_white.png" alt="Chakra Logo" width="200"/>
 </p>
 
 # Chakra — Autonomous Research System
