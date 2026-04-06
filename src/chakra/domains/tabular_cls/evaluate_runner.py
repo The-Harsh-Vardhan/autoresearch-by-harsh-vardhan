@@ -41,7 +41,7 @@ def build_model(config: dict, num_features: int, num_classes: int,
         raise ValueError(f"Unknown model kind: {kind}")
     model = model.to(device)
     if checkpoint:
-        payload = torch.load(checkpoint, map_location=device, weights_only=False)
+        payload = torch.load(checkpoint, map_location=device, weights_only=True)
         model.load_state_dict(payload["model"])
     model.eval()
     return model

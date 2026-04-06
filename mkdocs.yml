@@ -1,0 +1,56 @@
+site_name: Chakra CLI Docs
+site_description: Chakra CLI reference, execution guide, and workflow documentation.
+site_url: https://the-harsh-vardhan.github.io/Chakra-Autonomous-Research-System/
+repo_url: https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System
+edit_uri: blob/main/docs/
+
+theme:
+  name: material
+  language: en
+  palette:
+    - scheme: default
+      primary: teal
+      accent: amber
+  features:
+    - navigation.instant
+    - navigation.sections
+    - navigation.top
+    - search.highlight
+    - search.suggest
+    - content.code.copy
+
+nav:
+  - Home: index.md
+  - CLI:
+      - Overview: cli/index.md
+      - Commands: cli/commands.md
+      - Execution: cli/execution.md
+      - Troubleshooting: cli/troubleshooting.md
+  - Guides:
+      - Quickstart: quickstart.md
+      - How to Use: how_to_use.md
+      - Chakra Cycle: chakra_cycle.md
+      - Contributing: contributing.md
+      - Publishing to PyPI: publishing_to_pypi.md
+  - Reference:
+      - Notebook Workflow: reference/notebook_workflow.md
+      - Karpathy AutoResearch: reference/karpathy_autoresearch.md
+
+markdown_extensions:
+  - admonition
+  - attr_list
+  - def_list
+  - md_in_html
+  - tables
+  - toc:
+      permalink: true
+
+extra_css:
+  - stylesheets/extra.css
+
+plugins:
+  - search
+
+validation:
+  nav:
+    omitted_files: ignore

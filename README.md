@@ -8,6 +8,7 @@
 [![Python 3.10+](https://img.shields.io/badge/Python-3.10+-green.svg)](https://python.org)
 [![PyTorch 2.2+](https://img.shields.io/badge/PyTorch-2.2+-ee4c2c.svg)](https://pytorch.org)
 [![W&B Tracking](https://img.shields.io/badge/W%26B-Tracked-orange.svg)](https://wandb.ai)
+[![Docs](https://img.shields.io/badge/Docs-Chakra%20CLI-0d9488.svg)](https://the-harsh-vardhan.github.io/Chakra-Autonomous-Research-System/)
 [![47 Tests Passed](https://img.shields.io/badge/Tests-47%20Passed-brightgreen.svg)](#testing)
 [![3 Domains](https://img.shields.io/badge/Domains-3%20Shipped-purple.svg)](#shipped-domains)
 
@@ -16,6 +17,7 @@
 Chakra eliminates manual experiment management. You define a research domain once. Chakra handles the rest: scaffolding configs, running baselines, training models, evaluating checkpoints, validating contracts, generating reviews, and proposing the next iteration. One command runs the entire loop.
 
 > 📖 **[Read the Journey](JOURNEY.md)** — How this project evolved from a single Kaggle notebook to a cyclic autonomous system.
+> 📚 **[Open the Chakra CLI docs](https://the-harsh-vardhan.github.io/Chakra-Autonomous-Research-System/)** — The canonical command reference, execution guide, and troubleshooting hub.
 
 ```bash
 chakra aavart --domain tabular_cls --version v1.0 --device cpu --force
@@ -80,7 +82,7 @@ Each stage has a Sanskrit name that reflects its purpose:
 
 ## Quick Start
 
-> 📖 **For the full guide** see [How to Use Chakra](docs/how_to_use.md) — covers every command, config option, W&B setup, troubleshooting, and how to add your own domain. For a 5-minute walkthrough, see the [Quickstart](docs/quickstart.md). For the project's evolution story, see the [Journey](JOURNEY.md).
+> 📖 **For the full guide** see the [Chakra CLI docs](https://the-harsh-vardhan.github.io/Chakra-Autonomous-Research-System/) — covers every command, config option, execution mode, troubleshooting path, and how to add your own domain. For a 5-minute walkthrough, see the [Quickstart](docs/quickstart.md). For the project's evolution story, see the [Journey](JOURNEY.md).
 
 ### 1. Install
 

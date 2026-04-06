@@ -1,11 +1,48 @@
 name: nlp_lm
 display_name: NLP Language Modelling
+domain: nlp
+task: generation
 version_pattern: "^v\\d+\\.\\d+(?:\\.\\d+)?$"
 model_kinds:
   - gpt_nano
   - bigram
 primary_metric: val_bpb
 metric_direction: lower_is_better
+meta:
+  modality: sequential
+  supervision: self_supervised
+  output_type: generative
+capabilities:
+  supports_generation: true
+defaults:
+  model_family: gpt_nano
+  training_style: autoregressive
+  evaluation_strategy: heldout_val
+metrics:
+  primary: val_bpb
+  secondary: [val_loss, perplexity]
+search_space:
+  architectures: [gpt_nano, bigram]
+  optimizers: [adamw]
+  schedulers: [none]
+failure_modes: [oom, nan_loss, diverged_loss]
+ablation_templates:
+  architecture: [increase_n_layer]
+  optimization: [lower_lr]
+  data: [shorter_seq_len]
+lifecycle:
+  requires_gpu: true
+  supports_local: true
+  max_runtime: 90
+execution:
+  default: auto
+  supports: [local, kaggle]
+intent: optimize
+agents:
+  planner: enabled
+  executor: enabled
+  reviewer: enabled
+  optimizer: enabled
 benchmark_registry: benchmarks/nlp_lm_registry.json
 config_dir: configs/nlp_lm
 programs_doc: programs/nlp_lm.md

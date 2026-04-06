@@ -6,6 +6,7 @@ import argparse
 import sys
 
 from .core.domain_registry import discover_domains, get_domain
+from .core.exceptions import ChakraError
 from .core.lifecycle import (
     kaggle_status,
     mirror_obsidian,
@@ -13,6 +14,7 @@ from .core.lifecycle import (
     pull_kaggle,
     push_kaggle,
     review_run,
+    run_execution,
     scaffold_version,
     sync_run,
     validate_version,
@@ -82,6 +84,14 @@ def build_parser() -> argparse.ArgumentParser:
     ablation = subparsers.add_parser("next-ablation", help="Write the next bounded ablation suggestions")
     ablation.add_argument("--version", required=True)
 
+    execute = subparsers.add_parser("run-execution", help="Run version using local/kaggle/auto execution strategy")
+    execute.add_argument("--version", required=True)
+    execute.add_argument("--strategy", choices=["local", "kaggle", "auto"], default="auto")
+    execute.add_argument("--title", default=None)
+    execute.add_argument("--username", default=None)
+    execute.add_argument("--pull-outputs", action="store_true")
+    execute.add_argument("--dry-run", action="store_true")
+
     return parser
 
 
@@ -106,54 +116,68 @@ def _require_domain(args: argparse.Namespace) -> str:
 def main() -> int:
     from .core.utils import load_dotenv
     load_dotenv()
-    args = build_parser().parse_args()
-    domain = _require_domain(args)
+    try:
+        args = build_parser().parse_args()
+        domain = _require_domain(args)
 
-    if args.command == "list-domains":
-        domains = discover_domains()
-        if not domains:
-            print("No research domains discovered.")
-        else:
-            print(f"{'Name':<20} {'Display Name':<40} {'Primary Metric':<20}")
-            print("-" * 80)
-            for name, manifest in sorted(domains.items()):
-                print(f"{name:<20} {manifest.display_name:<40} {manifest.primary_metric:<20}")
+        if args.command == "list-domains":
+            domains = discover_domains()
+            if not domains:
+                print("No research domains discovered.")
+            else:
+                print(f"{'Name':<20} {'Display Name':<40} {'Primary Metric':<20}")
+                print("-" * 80)
+                for name, manifest in sorted(domains.items()):
+                    print(f"{name:<20} {manifest.display_name:<40} {manifest.primary_metric:<20}")
+            return 0
+
+        if args.command == "domain-info":
+            if not domain:
+                print("Error: provide --domain or --name for domain-info.", file=sys.stderr)
+                return 1
+            manifest = get_domain(domain)
+            print(f"Name:             {manifest.name}")
+            print(f"Display Name:     {manifest.display_name}")
+            print(f"Version Pattern:  {manifest.version_pattern}")
+            print(f"Model Kinds:      {', '.join(manifest.model_kinds)}")
+            print(f"Primary Metric:   {manifest.primary_metric} ({manifest.metric_direction})")
+            print(f"Benchmark:        {manifest.benchmark_registry}")
+            print(f"Config Dir:       {manifest.config_dir}")
+            print(f"Programs Doc:     {manifest.programs_doc}")
+            print(f"Entrypoints:")
+            for key, val in manifest.entrypoints.items():
+                print(f"  {key}: {val}")
+            return 0
+
+        if args.command == "scaffold-version":
+            scaffold_version(domain, args.version, parent=args.parent, lineage=args.lineage, force=args.force)
+        elif args.command == "validate-version":
+            validate_version(domain, args.version)
+        elif args.command == "push-kaggle":
+            push_kaggle(domain, args.version, title=args.title, username=args.username, dry_run=args.dry_run)
+        elif args.command == "kaggle-status":
+            kaggle_status(domain, args.version, username=args.username, dry_run=args.dry_run)
+        elif args.command == "pull-kaggle":
+            pull_kaggle(domain, args.version, username=args.username, dry_run=args.dry_run)
+        elif args.command == "sync-run":
+            sync_run(domain, args.version, source_dir=args.source_dir, wandb_url=args.wandb_url, dry_run=args.dry_run)
+        elif args.command == "review-run":
+            review_run(domain, args.version)
+        elif args.command == "mirror-obsidian":
+            mirror_obsidian(domain, args.version, output_dir=args.output_dir, dry_run=args.dry_run)
+        elif args.command == "next-ablation":
+            next_ablation(domain, args.version)
+        elif args.command == "run-execution":
+            run_execution(
+                domain,
+                args.version,
+                strategy=args.strategy,
+                title=args.title,
+                username=args.username,
+                dry_run=args.dry_run,
+                pull_outputs=args.pull_outputs,
+            )
         return 0
-
-    if args.command == "domain-info":
-        if not domain:
-            print("Error: provide --domain or --name for domain-info.", file=sys.stderr)
-            return 1
-        manifest = get_domain(domain)
-        print(f"Name:             {manifest.name}")
-        print(f"Display Name:     {manifest.display_name}")
-        print(f"Version Pattern:  {manifest.version_pattern}")
-        print(f"Model Kinds:      {', '.join(manifest.model_kinds)}")
-        print(f"Primary Metric:   {manifest.primary_metric} ({manifest.metric_direction})")
-        print(f"Benchmark:        {manifest.benchmark_registry}")
-        print(f"Config Dir:       {manifest.config_dir}")
-        print(f"Programs Doc:     {manifest.programs_doc}")
-        print(f"Entrypoints:")
-        for key, val in manifest.entrypoints.items():
-            print(f"  {key}: {val}")
-        return 0
-
-    if args.command == "scaffold-version":
-        scaffold_version(domain, args.version, parent=args.parent, lineage=args.lineage, force=args.force)
-    elif args.command == "validate-version":
-        validate_version(domain, args.version)
-    elif args.command == "push-kaggle":
-        push_kaggle(domain, args.version, title=args.title, username=args.username, dry_run=args.dry_run)
-    elif args.command == "kaggle-status":
-        kaggle_status(domain, args.version, username=args.username, dry_run=args.dry_run)
-    elif args.command == "pull-kaggle":
-        pull_kaggle(domain, args.version, username=args.username, dry_run=args.dry_run)
-    elif args.command == "sync-run":
-        sync_run(domain, args.version, source_dir=args.source_dir, wandb_url=args.wandb_url, dry_run=args.dry_run)
-    elif args.command == "review-run":
-        review_run(domain, args.version)
-    elif args.command == "mirror-obsidian":
-        mirror_obsidian(domain, args.version, output_dir=args.output_dir, dry_run=args.dry_run)
-    elif args.command == "next-ablation":
-        next_ablation(domain, args.version)
-    return 0
+    except ChakraError as exc:
+        print(f"Error: {exc}", file=sys.stderr)
+        return 1

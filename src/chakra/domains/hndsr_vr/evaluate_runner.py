@@ -37,7 +37,7 @@ def build_model(config: dict, device: torch.device, checkpoint: str | None) -> S
         beta_start=config["diffusion"]["beta_start"],
         beta_end=config["diffusion"]["beta_end"],
     ).to(device)
-    payload = torch.load(checkpoint, map_location=device, weights_only=False)
+    payload = torch.load(checkpoint, map_location=device, weights_only=True)
     model.load_state_dict(payload["model"])
     model.eval()
     return model

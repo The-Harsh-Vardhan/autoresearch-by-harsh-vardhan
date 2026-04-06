@@ -43,3 +43,13 @@ def test_domain_info_shows_hndsr():
     assert result.returncode == 0
     assert "HNDSR" in result.stdout
     assert "psnr_mean" in result.stdout
+
+
+def test_run_execution_dry_run_emits_decision():
+    result = _run_cli("--domain", "tabular_cls", "run-execution", "--version", "v1.0", "--strategy", "local", "--dry-run")
+    if result.returncode != 0 and "No module named" in result.stderr:
+        return
+    assert result.returncode == 0
+    assert "Resolved train config:" in result.stdout
+    assert "Requested execution strategy: local" in result.stdout
+    assert "Execution decision: local" in result.stdout

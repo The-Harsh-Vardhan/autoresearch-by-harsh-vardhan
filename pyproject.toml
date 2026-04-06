@@ -4,9 +4,9 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "chakra_auto_research"
-version = "0.3.1"
+version = "0.4.0"
 description = "Chakra — Autonomous Research System. A cyclic, domain-agnostic ML research engine."
-readme = "README.md"
+readme = {file = "README.md", content-type = "text/markdown"}
 license = {text = "MIT"}
 requires-python = ">=3.10"
 authors = [
@@ -30,28 +30,39 @@ classifiers = [
   "Programming Language :: Python :: 3.12",
   "Programming Language :: Python :: 3.13",
   "Topic :: Scientific/Engineering :: Artificial Intelligence",
+  "Typing :: Typed",
 ]
 dependencies = [
-  "pillow>=10.0.0",
   "pyyaml>=6.0.0",
+  "tqdm>=4.66.0",
+]
+
+[project.optional-dependencies]
+ml = [
+  "pillow>=10.0.0",
   "scikit-image>=0.22.0",
   "scikit-learn>=1.4.0",
   "torch>=2.2.0",
   "torchvision>=0.17.0",
-  "tqdm>=4.66.0",
   "wandb>=0.17.0",
 ]
-
-[project.optional-dependencies]
 dev = [
+  "chakra_auto_research[ml]",
   "pytest>=8.0.0",
+  "build>=1.0.0",
+  "twine>=5.0.0",
+]
+docs = [
+  "mkdocs>=1.6.1",
+  "mkdocs-material>=9.6.0",
 ]
 
 [project.urls]
 Homepage = "https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System"
 Repository = "https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System"
-Documentation = "https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System/blob/main/docs/how_to_use.md"
+Documentation = "https://the-harsh-vardhan.github.io/Chakra-Autonomous-Research-System/"
 Issues = "https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System/issues"
+Changelog = "https://github.com/The-Harsh-Vardhan/Chakra-Autonomous-Research-System/blob/main/CHANGELOG.md"
 
 [project.scripts]
 chakra = "chakra.chakra_cli:main"
@@ -63,6 +74,7 @@ package-dir = {"" = "src"}
 where = ["src"]
 
 [tool.setuptools.package-data]
+"chakra" = ["py.typed"]
 "chakra.domains.hndsr_vr" = ["domain.yaml"]
 "chakra.domains.nlp_lm" = ["domain.yaml"]
 "chakra.domains.tabular_cls" = ["domain.yaml"]

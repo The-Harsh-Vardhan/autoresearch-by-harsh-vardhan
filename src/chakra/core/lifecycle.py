@@ -10,12 +10,14 @@ from typing import Any
 
 try:
     import yaml
-except Exception:
+except ImportError:
     yaml = None
 
 from .domain_registry import DomainManifest, get_domain, load_lifecycle_hooks
+from .execution_engine import ExecutionEngine, build_train_command, infer_system_info, normalize_execution_config
+from .exceptions import ExecutionError
 from .interfaces import DomainLifecycleHooks, VersionPaths
-from .utils import REPO_ROOT, read_json, write_json, write_text
+from .utils import REPO_ROOT, load_config, read_json, write_json, write_text
 
 
 # ---------------------------------------------------------------------------
@@ -31,9 +33,11 @@ def _write_yaml(path: Path, payload: dict[str, Any]) -> None:
     path.write_text(rendered, encoding="utf-8")
 
 
-def _resolve_kaggle_username(username: str | None, metadata: dict[str, Any]) -> str:
+def _resolve_kaggle_username(username: str | None, metadata: dict[str, Any], dry_run: bool = False) -> str:
     if username:
         return username
+    if dry_run:
+        return "dry-run-user"
     env_username = os.environ.get("KAGGLE_USERNAME")
     if env_username:
         return env_username
@@ -144,7 +148,7 @@ def push_kaggle(domain_name: str, version: str, title: str | None = None, userna
     metadata = hooks.default_kernel_metadata()
     if paths.kernel_metadata.exists():
         metadata = read_json(paths.kernel_metadata)
-    resolved_username = _resolve_kaggle_username(username, metadata)
+    resolved_username = _resolve_kaggle_username(username, metadata, dry_run=dry_run)
     metadata["id"] = f"{resolved_username}/{hooks.version_slug(version)}"
     metadata["title"] = title or f"{version} {manifest.display_name}"
     metadata["code_file"] = paths.notebook.name
@@ -160,7 +164,7 @@ def kaggle_status(domain_name: str, version: str, username: str | None = None, d
     hooks = load_lifecycle_hooks(manifest)
     paths = hooks.resolve_version_paths(version)
     metadata = read_json(paths.kernel_metadata)
-    resolved_username = _resolve_kaggle_username(username, metadata)
+    resolved_username = _resolve_kaggle_username(username, metadata, dry_run=dry_run)
     _run_cmd(["kaggle", "kernels", "status", f"{resolved_username}/{hooks.version_slug(version)}"], dry_run=dry_run)
 
 
@@ -170,7 +174,7 @@ def pull_kaggle(domain_name: str, version: str, username: str | None = None, dry
     hooks = load_lifecycle_hooks(manifest)
     paths = hooks.resolve_version_paths(version)
     metadata = read_json(paths.kernel_metadata)
-    resolved_username = _resolve_kaggle_username(username, metadata)
+    resolved_username = _resolve_kaggle_username(username, metadata, dry_run=dry_run)
     paths.kaggle_output_dir.mkdir(parents=True, exist_ok=True)
     _run_cmd(["kaggle", "kernels", "output", f"{resolved_username}/{hooks.version_slug(version)}", "-p", str(paths.kaggle_output_dir)], dry_run=dry_run)
 
@@ -324,3 +328,122 @@ def next_ablation(domain_name: str, version: str) -> None:
     content = "# Next Ablations\n\n" + "\n".join([f"- {item}" for item in suggestions]) + "\n"
     write_text(paths.next_ablation, content)
     print(content)
+
+
+def _run_local_smoke_gate(
+    manifest: DomainManifest,
+    hooks: DomainLifecycleHooks,
+    version: str,
+    timeout_minutes: float | None = None,
+    dry_run: bool = False,
+) -> bool:
+    """Run local smoke training before remote execution."""
+    paths = hooks.resolve_version_paths(version)
+    train_runner = manifest.entrypoints.get("train_runner")
+    smoke_cfg = paths.configs.get("smoke")
+    if not train_runner or not smoke_cfg:
+        raise ExecutionError(
+            f"Domain '{manifest.name}' must provide 'train_runner' entrypoint and smoke config for local smoke gate."
+        )
+    cmd = build_train_command(train_runner, smoke_cfg, run_name=f"{version}-smoke-local-gate")
+    engine = ExecutionEngine()
+    timeout_seconds = int(timeout_minutes * 60) if timeout_minutes and timeout_minutes > 0 else None
+    code = engine.run_local(cmd, cwd=REPO_ROOT, dry_run=dry_run, timeout_seconds=timeout_seconds)
+    return code == 0
+
+
+def run_execution(
+    domain_name: str,
+    version: str,
+    strategy: str = "auto",
+    title: str | None = None,
+    username: str | None = None,
+    dry_run: bool = False,
+    pull_outputs: bool = False,
+) -> None:
+    """Run a version with local/kaggle/auto execution orchestration."""
+    manifest = get_domain(domain_name)
+    hooks = load_lifecycle_hooks(manifest)
+    paths = hooks.resolve_version_paths(version)
+    train_cfg = paths.configs.get("train")
+    if train_cfg is None or not train_cfg.exists():
+        raise FileNotFoundError(f"Missing train config for version '{version}': {train_cfg}")
+
+    print(f"Resolved train config: {train_cfg}")
+    print(f"Requested execution strategy: {strategy}")
+
+    cfg = load_config(train_cfg)
+    cfg.setdefault("execution", {})
+    cfg["execution"]["requested"] = strategy
+    cfg = normalize_execution_config(cfg)
+
+    effective_manifest = manifest
+    if strategy in {"local", "kaggle", "auto"}:
+        override_execution = dict(manifest.execution)
+        override_execution["default"] = strategy
+        effective_manifest = DomainManifest(
+            name=manifest.name,
+            display_name=manifest.display_name,
+            version_pattern=manifest.version_pattern,
+            model_kinds=manifest.model_kinds,
+            primary_metric=manifest.primary_metric,
+            metric_direction=manifest.metric_direction,
+            benchmark_registry=manifest.benchmark_registry,
+            config_dir=manifest.config_dir,
+            programs_doc=manifest.programs_doc,
+            entrypoints=manifest.entrypoints,
+            domain=manifest.domain,
+            task=manifest.task,
+            meta=manifest.meta,
+            capabilities=manifest.capabilities,
+            defaults=manifest.defaults,
+            metrics=manifest.metrics,
+            search_space=manifest.search_space,
+            failure_modes=manifest.failure_modes,
+            ablation_templates=manifest.ablation_templates,
+            lifecycle=manifest.lifecycle,
+            execution=override_execution,
+            intent=manifest.intent,
+            agents=manifest.agents,
+        )
+
+    engine = ExecutionEngine()
+    decision = engine.choose_strategy(cfg, infer_system_info(cfg), effective_manifest)
+    print(f"Execution decision: {decision.strategy} ({decision.reason})")
+
+    train_runner = manifest.entrypoints.get("train_runner")
+    if not train_runner:
+        raise ExecutionError(f"Domain '{domain_name}' has no train_runner entrypoint.")
+
+    if decision.strategy == "local":
+        cmd = build_train_command(train_runner, paths.configs["train"], run_name=f"{version}-train")
+        code = engine.run_local(cmd, cwd=REPO_ROOT, dry_run=dry_run)
+        if code != 0:
+            raise ExecutionError(f"Local execution failed with exit code {code}.")
+        return
+
+    timeout_minutes = cfg.get("execution", {}).get("smoke_timeout_minutes")
+    smoke_ok = _run_local_smoke_gate(
+        manifest,
+        hooks,
+        version=version,
+        timeout_minutes=timeout_minutes,
+        dry_run=dry_run,
+    )
+    if not smoke_ok:
+        raise ExecutionError("Local smoke gate failed; Kaggle execution blocked.")
+
+    def _push() -> None:
+        push_kaggle(domain_name, version, title=title, username=username, dry_run=dry_run)
+
+    def _status() -> None:
+        kaggle_status(domain_name, version, username=username, dry_run=dry_run)
+
+    def _pull() -> None:
+        pull_kaggle(domain_name, version, username=username, dry_run=dry_run)
+
+    engine.run_kaggle(
+        push_fn=_push,
+        status_fn=_status,
+        pull_fn=_pull if pull_outputs else None,
+    )

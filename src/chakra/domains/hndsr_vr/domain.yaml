@@ -1,11 +1,48 @@
 name: hndsr_vr
 display_name: HNDSR Satellite Super-Resolution
+domain: cv
+task: super_resolution
 version_pattern: "^vR(?:\\.P)?\\.\\d+(?:\\.\\d+)?$"
 model_kinds:
   - sr3
   - bicubic
 primary_metric: psnr_mean
 metric_direction: higher_is_better
+meta:
+  modality: spatial
+  supervision: supervised
+  output_type: generative
+capabilities:
+  supports_generation: true
+defaults:
+  model_family: sr3
+  training_style: diffusion
+  evaluation_strategy: paired_benchmark
+metrics:
+  primary: psnr_mean
+  secondary: [ssim_mean, lpips_mean]
+search_space:
+  architectures: [sr3, bicubic]
+  optimizers: [adamw]
+  schedulers: [none]
+failure_modes: [oom, nan_loss, missing_checkpoint]
+ablation_templates:
+  architecture: [increase_model_channels]
+  optimization: [increase_epochs]
+  data: [reduce_patch_size]
+lifecycle:
+  requires_gpu: true
+  supports_local: true
+  max_runtime: 120
+execution:
+  default: auto
+  supports: [local, kaggle]
+intent: benchmark
+agents:
+  planner: enabled
+  executor: enabled
+  reviewer: enabled
+  optimizer: enabled
 benchmark_registry: benchmarks/hndsr_vr_registry.json
 config_dir: configs/hndsr_vr
 programs_doc: programs/hndsr_vr.md

@@ -243,6 +243,6 @@ The core `lifecycle.py` calls these hooks — it never contains domain-specific 
 ## Next Steps
 
 - **Add W&B tracking** — Set up your `.env` and rerun experiments to see them in the W&B dashboard
-- **Add a new domain** — Follow the guide in [CONTRIBUTING.md](../CONTRIBUTING.md)
+- **Add a new domain** — Follow the guide in [Contributing](contributing.md)
 - **Push to Kaggle** — Use `push-kaggle` and `pull-kaggle` commands for cloud execution
 - **Extend the framework** — Add custom metrics, models, or datasets to existing domains

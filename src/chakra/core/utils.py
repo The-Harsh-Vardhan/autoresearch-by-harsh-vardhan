@@ -12,11 +12,41 @@ from typing import Any
 
 try:
     import yaml
-except Exception:
+except ImportError:
     yaml = None
 
 
-REPO_ROOT = Path(__file__).resolve().parents[3]
+# ---------------------------------------------------------------------------
+# Workspace resolution — works for both git-clone and pip-install users
+# ---------------------------------------------------------------------------
+
+def _find_workspace_root() -> Path:
+    """Locate the Chakra workspace root directory.
+
+    Resolution order:
+      1. ``CHAKRA_WORKSPACE`` environment variable (explicit override)
+      2. Walk up from *cwd()* looking for ``pyproject.toml``
+      3. Fall back to *cwd()* (assume user is in their project directory)
+    """
+    env_root = os.environ.get("CHAKRA_WORKSPACE")
+    if env_root:
+        candidate = Path(env_root).resolve()
+        if candidate.is_dir():
+            return candidate
+
+    # Walk up from cwd looking for a pyproject.toml
+    current = Path.cwd().resolve()
+    for parent in [current, *current.parents]:
+        if (parent / "pyproject.toml").is_file():
+            return parent
+        # Stop at filesystem root
+        if parent == parent.parent:
+            break
+
+    return Path.cwd().resolve()
+
+
+REPO_ROOT = _find_workspace_root()
 
 
 def load_dotenv(root: Path | None = None) -> None:

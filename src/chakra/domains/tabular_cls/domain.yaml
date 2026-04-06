@@ -1,11 +1,48 @@
 name: tabular_cls
 display_name: Tabular Classification
+domain: tb
+task: classification
 version_pattern: "^v\\d+\\.\\d+(?:\\.\\d+)?$"
 model_kinds:
   - logistic
   - mlp
 primary_metric: accuracy
 metric_direction: higher_is_better
+meta:
+  modality: tabular
+  supervision: supervised
+  output_type: discriminative
+capabilities:
+  supports_generation: false
+defaults:
+  model_family: mlp
+  training_style: supervised
+  evaluation_strategy: heldout_val
+metrics:
+  primary: accuracy
+  secondary: [val_f1]
+search_space:
+  architectures: [mlp, logistic]
+  optimizers: [adamw, sgd]
+  schedulers: [none]
+failure_modes: [overfit, class_imbalance]
+ablation_templates:
+  architecture: [increase_hidden_dim]
+  optimization: [increase_epochs]
+  data: [switch_dataset]
+lifecycle:
+  requires_gpu: false
+  supports_local: true
+  max_runtime: 30
+execution:
+  default: local
+  supports: [local, kaggle]
+intent: benchmark
+agents:
+  planner: enabled
+  executor: enabled
+  reviewer: enabled
+  optimizer: enabled
 benchmark_registry: benchmarks/tabular_cls_registry.json
 config_dir: configs/tabular_cls
 programs_doc: programs/tabular_cls.md

@@ -12,7 +12,7 @@ This guide covers everything you need to know to use Chakra: from installation t
 4. [Running Your First Experiment](#4-running-your-first-experiment)
 5. [The Seven-Step Lifecycle](#5-the-seven-step-lifecycle)
 6. [Configuration System](#6-configuration-system)
-7. [Weights & Biases Integration](#7-weights--biases-integration)
+7. [Weights & Biases Integration](#7-weights-biases-integration)
 8. [CLI Reference](#8-cli-reference)
 9. [Working with Each Domain](#9-working-with-each-domain)
 10. [Adding Your Own Domain](#10-adding-your-own-domain)
@@ -497,6 +497,22 @@ python -m chakra --domain tabular_cls domain-info
 | `kaggle-status` | `--version V` `[--username U]` `[--dry-run]` | Check kernel run status |
 | `pull-kaggle` | `--version V` `[--username U]` `[--dry-run]` | Pull outputs into artifacts |
 
+### Execution Orchestration
+
+The `run-execution` command chooses between local and Kaggle execution paths and always runs a local smoke gate before Kaggle submission.
+
+```bash
+python -m chakra --domain nlp_lm run-execution --version v1.0 --strategy auto --dry-run
+python -m chakra --domain tabular_cls run-execution --version v1.0 --strategy local --dry-run
+```
+
+Behavior summary:
+
+- `local` runs the train runner directly.
+- `kaggle` performs a local smoke gate first, then push/status/pull.
+- `auto` uses manifest lifecycle/execution hints and system info to choose a backend.
+- `--dry-run` prints the command flow without invoking the backend tools.
+
 ### Runner Commands (Direct)
 
 Runners are invoked directly via Python modules, not through the CLI:
@@ -591,7 +607,7 @@ python -m chakra --domain nlp_lm validate-version --version v1.0
 
 ## 10. Adding Your Own Domain
 
-AutoResearch is designed to be extended. Adding a new domain requires **zero changes** to the core engine. See [CONTRIBUTING.md](../CONTRIBUTING.md) for the full tutorial.
+AutoResearch is designed to be extended. Adding a new domain requires **zero changes** to the core engine. See [Contributing](contributing.md) for the full tutorial.
 
 ### Step-by-Step
 
